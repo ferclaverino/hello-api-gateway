@@ -8,7 +8,10 @@ const backends: string[] = (() => {
   if (env) return env.split(",").map((s) => s.trim());
   const count = Number(process.env.BACKEND_COUNT) || 2;
   const basePort = Number(process.env.BACKEND_BASE_PORT) || 3001;
-  return Array.from({ length: count }, (_, i) => `http://${HOST}:${basePort + i}`);
+  return Array.from(
+    { length: count },
+    (_, i) => `http://${HOST}:${basePort + i}`,
+  );
 })();
 
 let currentIndex = 0;
