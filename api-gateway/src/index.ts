@@ -1,39 +1,36 @@
 import Fastify from "fastify";
+import { config } from "./config.js";
+import {
+  createRoundRobin,
+  errorSchema,
+  healthSchema,
+  type ErrorResponse,
+  type HealthResponse,
+} from "./types.js";
 
-const PORT = Number(process.env.PORT) || 3000;
-const HOST = process.env.HOST || "127.0.0.1";
-
-const backends: string[] = (() => {
-  const env = process.env.BACKENDS;
-  if (env) return env.split(",").map((s) => s.trim());
-  const count = Number(process.env.BACKEND_COUNT) || 2;
-  const basePort = Number(process.env.BACKEND_BASE_PORT) || 3001;
-  return Array.from(
-    { length: count },
-    (_, i) => `http://${HOST}:${basePort + i}`,
-  );
-})();
-
-let currentIndex = 0;
-
-function nextBackend(): string {
-  const backend = backends[currentIndex % backends.length];
-  currentIndex++;
-  return backend;
-}
+const { PORT, HOST, backends } = config;
+const robin = createRoundRobin(backends);
 
 const app = Fastify({ logger: true });
 
 app.addHook("onRequest", async (request, reply) => {
   if (request.url === "/health") return;
 
-  const backend = nextBackend();
+  const backend = robin.next();
   const target = `${backend}${request.url}`;
 
   try {
+    const headers = new Headers();
+    for (const [key, value] of Object.entries(request.headers)) {
+      if (value !== undefined) {
+        headers.set(key, Array.isArray(value) ? value.join(", ") : value);
+      }
+    }
+    headers.set("host", new URL(backend).host);
+
     const res = await fetch(target, {
       method: request.method,
-      headers: { ...request.headers, host: new URL(backend).host },
+      headers,
     });
 
     reply.code(res.status);
@@ -44,14 +41,17 @@ app.addHook("onRequest", async (request, reply) => {
     });
 
     reply.send(await res.text());
-  } catch (err) {
-    app.log.error(err, `Failed to proxy to ${target}`);
-    reply.code(502).send({ error: "Bad Gateway", backend });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    app.log.error({ err: new Error(message) }, `Failed to proxy to ${target}`);
+    const body: ErrorResponse = { error: "Bad Gateway", backend };
+    reply.code(502).send(body);
   }
 });
 
-app.get("/health", async () => {
-  return { status: "ok", backends };
+app.get("/health", { schema: healthSchema }, async () => {
+  const body: HealthResponse = { status: "ok", backends: [...backends] };
+  return body;
 });
 
 app.listen({ port: PORT, host: HOST }, (err) => {
