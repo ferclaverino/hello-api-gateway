@@ -4,18 +4,20 @@
 
 - `light-service/` — Fastify + TypeScript hello world microservice
 - `api-gateway/` — Fastify + TypeScript round-robin load balancing proxy
-- `start.sh` — Launches N instances of light-service + API gateway
 
 ## Quick Start
 
 ```bash
-./start.sh 3        # Start 3 light-service instances + gateway
-./start.sh          # Default: 2 instances
+# Terminal 1 — light-service
+cd light-service && npm install && npm start
+
+# Terminal 2 — api-gateway
+cd api-gateway && npm install && npm start
 ```
 
 This starts:
-- N light-service instances on ports 3001, 3002, ... 3000+N
-- API gateway on port 3000 with round-robin across all backends
+- light-service on port 3001
+- API gateway on port 3000 with round-robin across backends
 
 ## Endpoints
 
@@ -29,11 +31,11 @@ This starts:
 ```bash
 # light-service
 cd light-service && npm install
-PORT=3001 npx tsx src/index.ts
+PORT=3001 npm start
 
 # api-gateway
 cd api-gateway && npm install
-BACKENDS=http://127.0.0.1:3001,http://127.0.0.1:3002 npx tsx src/index.ts
+BACKENDS=http://127.0.0.1:3001,http://127.0.0.1:3002 npm start
 ```
 
 ## Environment Variables
