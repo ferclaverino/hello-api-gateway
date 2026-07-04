@@ -33,3 +33,11 @@ curl http://127.0.0.1:3000/health    # Check gateway health
 ```
 
 Observe the `instance` field in `/hello` responses to verify load balancing.
+
+## AI Skills
+
+This project uses [autoskills](https://github.com/midudev/autoskills) to automatically install AI agent skills based on the detected tech stack.
+
+```bash
+npx autoskills
+```
