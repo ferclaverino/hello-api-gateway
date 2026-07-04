@@ -1,11 +1,12 @@
 import Fastify from "fastify";
+import { config } from "./config.js";
+import { helloSchema, type HelloResponse } from "./types.js";
 
-const PORT = Number(process.env.PORT) || 3001;
-const HOST = process.env.HOST || "127.0.0.1";
+const { PORT, HOST } = config;
 
 const app = Fastify({ logger: true });
 
-app.get("/hello", async () => {
+app.get("/hello", { schema: helloSchema }, async (): Promise<HelloResponse> => {
   return { message: "Hello World!", instance: PORT };
 });
 
