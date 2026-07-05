@@ -1,0 +1,6 @@
+# API Gateway route configuration
+# Maps path prefixes to backend server lists (round-robin within each route)
+routes:
+  /hello:
+    - http://127.0.0.1:3001
+    - http://127.0.0.1:3002
