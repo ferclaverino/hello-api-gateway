@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
 import YAML from "yaml";
-import { parseBackendUrl, createRouteTable, type RouteTable } from "./types.js";
+import { parseBackendUrl, createRouteTable } from "./routingUtils";
 
 const EnvSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),

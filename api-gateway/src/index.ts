@@ -1,11 +1,7 @@
 import Fastify from "fastify";
-import { config } from "./config.js";
-import {
-  errorSchema,
-  healthSchema,
-  type ErrorResponse,
-  type HealthResponse,
-} from "./types.js";
+import { config } from "./config";
+import { proxyToBackend } from "./proxyUtils";
+import { healthSchema, type HealthResponse } from "./types";
 
 const { PORT, HOST, backends, routeTable } = config;
 
@@ -15,43 +11,13 @@ app.addHook("onRequest", async (request, reply) => {
   if (request.url === "/health") return;
 
   const route = routeTable?.match(request.url);
-
   if (!route) {
     reply.code(404).send({ error: "Not Found" });
     return;
   }
 
   const backend = route.robin.next();
-  const target = `${backend}${request.url}`;
-
-  try {
-    const headers = new Headers();
-    for (const [key, value] of Object.entries(request.headers)) {
-      if (value !== undefined) {
-        headers.set(key, Array.isArray(value) ? value.join(", ") : value);
-      }
-    }
-    headers.set("host", new URL(backend).host);
-
-    const res = await fetch(target, {
-      method: request.method,
-      headers,
-    });
-
-    reply.code(res.status);
-    res.headers.forEach((value, key) => {
-      if (key !== "transfer-encoding") {
-        reply.header(key, value);
-      }
-    });
-
-    reply.send(await res.text());
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
-    app.log.error({ err: new Error(message) }, `Failed to proxy to ${target}`);
-    const body: ErrorResponse = { error: "Bad Gateway", backend };
-    reply.code(502).send(body);
-  }
+  await proxyToBackend(app, request, reply, backend);
 });
 
 app.get("/health", { schema: healthSchema }, async () => {
