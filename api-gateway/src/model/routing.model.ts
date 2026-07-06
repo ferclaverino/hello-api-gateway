@@ -1,4 +1,4 @@
-import { parseBackendUrl, createRoundRobin } from "../utils/routing.util";
+import { parseBackendUrl, createRoundRobin } from "../util/routing.util";
 
 export type BackendUrl = string & { readonly __brand: unique symbol };
 
@@ -27,7 +27,10 @@ export class RouteTable {
 
   match(url: string): RouteEntry | undefined {
     return this.entries.find(
-      (e) => url === e.path || url.startsWith(e.path + "/") || url.startsWith(e.path + "?"),
+      (e) =>
+        url === e.path ||
+        url.startsWith(e.path + "/") ||
+        url.startsWith(e.path + "?"),
     );
   }
 

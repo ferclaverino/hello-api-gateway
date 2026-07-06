@@ -1,8 +1,11 @@
 import Fastify from "fastify";
 import type { ZodTypeProvider } from "@fastify/type-provider-zod";
-import { serializerCompiler, validatorCompiler } from "@fastify/type-provider-zod";
+import {
+  serializerCompiler,
+  validatorCompiler,
+} from "@fastify/type-provider-zod";
 import { config } from "./config";
-import { proxyToBackend } from "./utils/proxy.util";
+import { proxyToBackend } from "./util/proxy.util";
 import { healthSchema, type HealthResponse } from "./model/health.model";
 
 const { PORT, HOST, backends, routeTable } = config;
@@ -24,11 +27,16 @@ app.addHook("onRequest", async (request, reply) => {
   await proxyToBackend(app, request, reply, backend);
 });
 
-app.withTypeProvider<ZodTypeProvider>().get("/health", { schema: healthSchema }, async () => {
-  const routePaths = routeTable?.getEntries().map((e) => e.path) ?? [];
-  const body: HealthResponse = { status: "ok", backends: routePaths.length ? routePaths : [...backends] };
-  return body;
-});
+app
+  .withTypeProvider<ZodTypeProvider>()
+  .get("/health", { schema: healthSchema }, async () => {
+    const routePaths = routeTable?.getEntries().map((e) => e.path) ?? [];
+    const body: HealthResponse = {
+      status: "ok",
+      backends: routePaths.length ? routePaths : [...backends],
+    };
+    return body;
+  });
 
 app.listen({ port: PORT, host: HOST }, (err) => {
   if (err) {
