@@ -1,9 +1,7 @@
-import { z } from "zod";
+import { EnvSchema } from "./infrastructure/config/env.schema.js";
 
-const EnvSchema = z.object({
-  PORT: z.coerce.number().int().positive().default(3001),
-  HOST: z.string().default("127.0.0.1"),
-});
+const env = EnvSchema.parse(process.env);
 
-export type EnvConfig = z.infer<typeof EnvSchema>;
-export const config = EnvSchema.parse(process.env);
+export const config = {
+  ...env,
+};

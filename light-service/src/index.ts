@@ -1,22 +1,17 @@
-import Fastify from "fastify";
-import type { ZodTypeProvider } from "@fastify/type-provider-zod";
-import { serializerCompiler, validatorCompiler } from "@fastify/type-provider-zod";
+import { createServer } from "./server.js";
 import { config } from "./config.js";
-import { helloSchema, type HelloResponse } from "./types.js";
+import { registerHelloRoute } from "./adapters/routes/hello.js";
 
 const { PORT, HOST } = config;
 
-const app = Fastify({ logger: true });
-app.setValidatorCompiler(validatorCompiler);
-app.setSerializerCompiler(serializerCompiler);
+const app = createServer();
 
-app.withTypeProvider<ZodTypeProvider>().get("/hello", { schema: helloSchema }, async (): Promise<HelloResponse> => {
-  return { message: "Hello World!", instance: PORT };
-});
+registerHelloRoute(app, PORT);
 
 app.listen({ port: PORT, host: HOST }, (err) => {
   if (err) {
     app.log.error(err);
     process.exit(1);
   }
+  app.log.info(`Light service listening on port ${PORT}`);
 });
