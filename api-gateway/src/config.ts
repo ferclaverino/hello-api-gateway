@@ -1,10 +1,10 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import YAML from "yaml";
-import { EnvSchema } from "./model/config";
-import type { EnvConfig } from "./model/config";
-import { RouteTable } from "./model/routing";
-import { parseBackendUrl } from "./routingUtils";
+import { EnvSchema } from "./model/config.model";
+import type { EnvConfig } from "./model/config.model";
+import { RouteTable } from "./model/routing.model";
+import { parseBackendUrl } from "./utils/routing.util";
 
 function buildBackends(config: EnvConfig): readonly string[] {
   if (config.BACKENDS) {

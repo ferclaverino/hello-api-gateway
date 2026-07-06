@@ -2,8 +2,8 @@ import Fastify from "fastify";
 import type { ZodTypeProvider } from "@fastify/type-provider-zod";
 import { serializerCompiler, validatorCompiler } from "@fastify/type-provider-zod";
 import { config } from "./config";
-import { proxyToBackend } from "./proxyUtils";
-import { healthSchema, type HealthResponse } from "./model/schemas";
+import { proxyToBackend } from "./utils/proxy.util";
+import { healthSchema, type HealthResponse } from "./model/health.model";
 
 const { PORT, HOST, backends, routeTable } = config;
 

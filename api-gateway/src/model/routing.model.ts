@@ -1,4 +1,4 @@
-import { parseBackendUrl, createRoundRobin } from "../routingUtils";
+import { parseBackendUrl, createRoundRobin } from "../utils/routing.util";
 
 export type BackendUrl = string & { readonly __brand: unique symbol };
 

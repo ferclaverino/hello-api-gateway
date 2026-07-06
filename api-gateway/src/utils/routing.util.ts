@@ -1,4 +1,4 @@
-import type { BackendUrl, RoundRobin } from "./model/routing";
+import type { BackendUrl, RoundRobin } from "../model/routing.model";
 
 export function parseBackendUrl(raw: string): BackendUrl {
   try {
