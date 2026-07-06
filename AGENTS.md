@@ -24,6 +24,33 @@ cd api-gateway && npm install && npm start
 - No comments in code unless explicitly requested
 - Env vars for configuration (PORT, HOST, BACKENDS, etc.)
 
+## Architecture
+
+Clean architecture with four layers:
+
+```
+src/
+├── domain/           # Pure business logic, zero external deps
+├── application/      # Use cases
+├── infrastructure/   # I/O, external services
+├── adapters/         # Framework wiring (Fastify hooks, routes)
+├── server.ts         # Fastify instance creation
+├── config.ts         # Composition root
+└── index.ts          # Bootstrap entry point
+```
+
+Dependency rule:
+
+```
+adapters → application → domain
+                ↓
+          infrastructure
+```
+
+- Domain type files use specific names (`domain/routing.ts`), never `types.ts`
+- `index.ts` only calls adapter registration + `app.listen()`
+- Simple services can flatten; use full layers when business logic grows
+
 ## Testing
 
 No test suite yet. Verify manually:
