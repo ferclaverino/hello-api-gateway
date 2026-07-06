@@ -1,7 +1,7 @@
-import { EnvSchema } from "./model/config.model";
-import { RouteTable } from "./model/routing.model";
-import { buildBackends } from "./util/config.util";
-import { loadRoutes } from "./data/config.data";
+import { EnvSchema } from "./infrastructure/config/env.schema";
+import { RouteTable } from "./domain/route-table";
+import { buildBackends } from "./infrastructure/config/build-backends";
+import { loadRoutes } from "./infrastructure/config/yaml-loader";
 
 const env = EnvSchema.parse(process.env);
 const yamlRoutes = loadRoutes(env.ROUTES_FILE);

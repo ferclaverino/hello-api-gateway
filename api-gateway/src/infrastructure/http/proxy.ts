@@ -1,18 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
-
-export function buildUpstreamHeaders(
-  requestHeaders: FastifyRequest["headers"],
-  backendUrl: string,
-): Headers {
-  const headers = new Headers();
-  for (const [key, value] of Object.entries(requestHeaders)) {
-    if (value !== undefined) {
-      headers.set(key, Array.isArray(value) ? value.join(", ") : value);
-    }
-  }
-  headers.set("host", new URL(backendUrl).host);
-  return headers;
-}
+import { buildUpstreamHeaders } from "./headers";
 
 export async function proxyToBackend(
   app: FastifyInstance,

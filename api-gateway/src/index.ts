@@ -1,42 +1,17 @@
-import Fastify from "fastify";
-import type { ZodTypeProvider } from "@fastify/type-provider-zod";
-import {
-  serializerCompiler,
-  validatorCompiler,
-} from "@fastify/type-provider-zod";
+import { createServer } from "./server";
 import { config } from "./config";
-import { proxyToBackend } from "./util/proxy.util";
-import { healthSchema, type HealthResponse } from "./model/health.model";
+import { registerProxyHook } from "./adapters/hooks/proxy-hook";
+import { registerHealthRoute } from "./adapters/routes/health";
 
 const { PORT, HOST, backends, routeTable } = config;
 
-const app = Fastify({ logger: true });
-app.setValidatorCompiler(validatorCompiler);
-app.setSerializerCompiler(serializerCompiler);
+const app = createServer();
 
-app.addHook("onRequest", async (request, reply) => {
-  if (request.url === "/health") return;
+if (routeTable) {
+  registerProxyHook(app, routeTable);
+}
 
-  const route = routeTable?.match(request.url);
-  if (!route) {
-    reply.code(404).send({ error: "Not Found" });
-    return;
-  }
-
-  const backend = route.robin.next();
-  await proxyToBackend(app, request, reply, backend);
-});
-
-app
-  .withTypeProvider<ZodTypeProvider>()
-  .get("/health", { schema: healthSchema }, async () => {
-    const routePaths = routeTable?.getEntries().map((e) => e.path) ?? [];
-    const body: HealthResponse = {
-      status: "ok",
-      backends: routePaths.length ? routePaths : [...backends],
-    };
-    return body;
-  });
+registerHealthRoute(app, routeTable, backends);
 
 app.listen({ port: PORT, host: HOST }, (err) => {
   if (err) {

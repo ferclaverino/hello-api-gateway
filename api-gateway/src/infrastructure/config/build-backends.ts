@@ -1,5 +1,5 @@
-import type { EnvConfig } from "../model/config.model";
-import { parseBackendUrl } from "./routing.util";
+import type { EnvConfig } from "./env.schema";
+import { parseBackendUrl } from "../../domain/round-robin";
 
 export function buildBackends(config: EnvConfig): readonly string[] {
   if (config.BACKENDS) {

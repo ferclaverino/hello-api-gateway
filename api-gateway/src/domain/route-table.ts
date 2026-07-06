@@ -1,16 +1,5 @@
-import { parseBackendUrl, createRoundRobin } from "../util/routing.util";
-
-export type BackendUrl = string & { readonly __brand: unique symbol };
-
-export interface RoundRobin {
-  next(): BackendUrl;
-}
-
-export interface RouteEntry {
-  path: string;
-  backends: readonly string[];
-  robin: RoundRobin;
-}
+import type { RouteEntry } from "./routing";
+import { parseBackendUrl, createRoundRobin } from "./round-robin";
 
 export class RouteTable {
   private entries: RouteEntry[];
