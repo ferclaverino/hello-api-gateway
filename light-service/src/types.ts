@@ -1,16 +1,12 @@
-import type { FromSchema } from "json-schema-to-ts";
+import { z } from "zod";
 
 export const helloSchema = {
   response: {
-    200: {
-      type: "object",
-      properties: {
-        message: { type: "string" },
-        instance: { type: "number" },
-      },
-      required: ["message", "instance"],
-    },
+    200: z.object({
+      message: z.string(),
+      instance: z.number(),
+    }),
   },
-} as const;
+};
 
-export type HelloResponse = FromSchema<typeof helloSchema.response["200"]>;
+export type HelloResponse = z.infer<typeof helloSchema.response["200"]>;
