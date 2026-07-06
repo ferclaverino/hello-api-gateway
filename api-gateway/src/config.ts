@@ -1,19 +1,10 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { z } from "zod";
 import YAML from "yaml";
-import { parseBackendUrl, createRouteTable } from "./routingUtils";
-
-const EnvSchema = z.object({
-  PORT: z.coerce.number().int().positive().default(3000),
-  HOST: z.string().default("127.0.0.1"),
-  BACKENDS: z.string().optional(),
-  BACKEND_COUNT: z.coerce.number().int().positive().default(2),
-  BACKEND_BASE_PORT: z.coerce.number().int().positive().default(3001),
-  ROUTES_FILE: z.string().default("routes.yaml"),
-});
-
-export type EnvConfig = z.infer<typeof EnvSchema>;
+import { EnvSchema } from "./model/config";
+import type { EnvConfig } from "./model/config";
+import { RouteTable } from "./model/routing";
+import { parseBackendUrl } from "./routingUtils";
 
 function buildBackends(config: EnvConfig): readonly string[] {
   if (config.BACKENDS) {
@@ -45,7 +36,7 @@ const env = EnvSchema.parse(process.env);
 const yamlRoutes = loadRoutes(env.ROUTES_FILE);
 
 const routeTable = yamlRoutes
-  ? createRouteTable(yamlRoutes)
+  ? new RouteTable(yamlRoutes)
   : undefined;
 
 const fallbackBackends = buildBackends(env);

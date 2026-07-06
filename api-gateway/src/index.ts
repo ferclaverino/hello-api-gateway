@@ -1,11 +1,15 @@
 import Fastify from "fastify";
+import type { ZodTypeProvider } from "@fastify/type-provider-zod";
+import { serializerCompiler, validatorCompiler } from "@fastify/type-provider-zod";
 import { config } from "./config";
 import { proxyToBackend } from "./proxyUtils";
-import { healthSchema, type HealthResponse } from "./types";
+import { healthSchema, type HealthResponse } from "./model/schemas";
 
 const { PORT, HOST, backends, routeTable } = config;
 
 const app = Fastify({ logger: true });
+app.setValidatorCompiler(validatorCompiler);
+app.setSerializerCompiler(serializerCompiler);
 
 app.addHook("onRequest", async (request, reply) => {
   if (request.url === "/health") return;
@@ -20,8 +24,8 @@ app.addHook("onRequest", async (request, reply) => {
   await proxyToBackend(app, request, reply, backend);
 });
 
-app.get("/health", { schema: healthSchema }, async () => {
-  const routePaths = routeTable?.entries.map((e) => e.path) ?? [];
+app.withTypeProvider<ZodTypeProvider>().get("/health", { schema: healthSchema }, async () => {
+  const routePaths = routeTable?.getEntries().map((e) => e.path) ?? [];
   const body: HealthResponse = { status: "ok", backends: routePaths.length ? routePaths : [...backends] };
   return body;
 });
@@ -33,7 +37,7 @@ app.listen({ port: PORT, host: HOST }, (err) => {
   }
   app.log.info(`API Gateway listening on port ${PORT}`);
   if (routeTable) {
-    for (const entry of routeTable.entries) {
+    for (const entry of routeTable.getEntries()) {
       app.log.info(`  ${entry.path} -> ${entry.backends.join(", ")}`);
     }
   } else {
