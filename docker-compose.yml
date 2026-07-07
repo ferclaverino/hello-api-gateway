@@ -3,23 +3,29 @@ services:
     build:
       context: ./light-service
       dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
     environment:
       PORT: "3001"
       HOST: "0.0.0.0"
     volumes:
       - ./light-service:/app
       - /app/node_modules
+    restart: unless-stopped
 
   light-service-2:
     build:
       context: ./light-service
       dockerfile: Dockerfile.dev
+    ports:
+      - "3002:3002"
     environment:
       PORT: "3002"
       HOST: "0.0.0.0"
     volumes:
       - ./light-service:/app
       - /app/node_modules
+    restart: unless-stopped
 
   api-gateway:
     build:
@@ -32,6 +38,7 @@ services:
     volumes:
       - ./api-gateway:/app
       - /app/node_modules
+    restart: unless-stopped
     depends_on:
       - light-service-1
       - light-service-2
