@@ -1,7 +1,7 @@
-import { createServer } from "./server";
+import { createServer } from "./infrastructure/fastify/create-server";
 import { config } from "./infrastructure/config/config-loader";
-import { registerProxyHook } from "./adapters/hooks/proxy-hook";
-import { registerHealthRoute } from "./adapters/routes/health";
+import { registerProxyHook } from "./infrastructure/fastify/register-proxy-hook";
+import { registerHealthRoute } from "./infrastructure/fastify/register-health-route";
 import { RouteTable } from "./domain/route-table";
 
 const { PORT, HOST, fallbackBackends, routes } = config;
