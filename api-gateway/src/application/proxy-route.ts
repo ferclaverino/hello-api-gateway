@@ -14,6 +14,6 @@ export async function handleProxyRequest(
     return;
   }
 
-  const backend = route.robin.next();
+  const backend = route.loadBalancer.next();
   await proxyToBackend(app, request, reply, backend);
 }

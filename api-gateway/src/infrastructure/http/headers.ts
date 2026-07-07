@@ -1,6 +1,6 @@
 export function buildUpstreamHeaders(
   requestHeaders: Record<string, string | string[] | undefined>,
-  backendUrl: string,
+  backendUrl: URL,
 ): Headers {
   const headers = new Headers();
   for (const [key, value] of Object.entries(requestHeaders)) {

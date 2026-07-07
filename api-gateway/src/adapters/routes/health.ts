@@ -7,7 +7,7 @@ import type { RouteTable } from "../../domain/route-table";
 export function registerHealthRoute(
   app: FastifyInstance,
   routeTable: RouteTable | undefined,
-  fallbackBackends: readonly string[],
+  fallbackBackends: readonly URL[],
 ): void {
   app
     .withTypeProvider<ZodTypeProvider>()

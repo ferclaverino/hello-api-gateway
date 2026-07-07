@@ -3,11 +3,18 @@ import type { HealthResponse } from "../infrastructure/schemas/health.schema";
 
 export function buildHealthResponse(
   routeTable: RouteTable | undefined,
-  fallbackBackends: readonly string[],
+  fallbackBackends: readonly URL[],
 ): HealthResponse {
-  const routePaths = routeTable?.getEntries().map((e) => e.path) ?? [];
+  const routes =
+    routeTable
+      ?.getEntries()
+      .map((r) => ({
+        path: r.path,
+        backends: r.backends.map((b) => b.toString()),
+      })) ?? [];
   return {
     status: "ok",
-    backends: routePaths.length ? routePaths : [...fallbackBackends],
+    routes,
+    fallbackBackends: fallbackBackends.map((backend) => backend.toString()),
   };
 }

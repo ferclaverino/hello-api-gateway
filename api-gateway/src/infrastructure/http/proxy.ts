@@ -5,7 +5,7 @@ export async function proxyToBackend(
   app: FastifyInstance,
   request: FastifyRequest,
   reply: FastifyReply,
-  backend: string,
+  backend: URL,
 ): Promise<void> {
   const target = `${backend}${request.url}`;
   const headers = buildUpstreamHeaders(request.headers, backend);
