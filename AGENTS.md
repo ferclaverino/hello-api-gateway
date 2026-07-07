@@ -3,6 +3,7 @@
 ## Project Overview
 
 Two Fastify + TypeScript services:
+
 - `light-service/` — Hello world microservice
 - `api-gateway/` — Round-robin load balancing proxy
 
@@ -26,34 +27,36 @@ cd api-gateway && npm install && npm start
 
 ## Architecture
 
-Clean architecture with four layers:
+This project follows a pragmatic Clean Architecture approach with four layers:
 
-```
-src/
-├── domain/           # Pure business logic, zero external deps
-├── application/      # Use cases
-├── infrastructure/   # I/O, external services
-├── adapters/         # Framework wiring (Fastify hooks, routes)
-├── server.ts         # Fastify instance creation
-├── config.ts         # Composition root
-└── index.ts          # Bootstrap entry point
-```
+- `domain`: core business concepts and rules. Must not depend on other layers.
+- `application`: use cases and application orchestration. May depend only on `domain`.
+- `adapters`: protocol and interface adapters (HTTP schemas, mappers, handlers, DTOs). May depend on `application` and `domain`.
+- `infrastructure`: frameworks, libraries, configuration, Fastify, HTTP clients, YAML parsing, environment variables, logging, etc. May depend on any inner layer.
 
-Dependency rule:
+Dependency direction must always point inward.
 
-```
-adapters → application → domain
-                ↓
-          infrastructure
-```
+### Guidelines
 
-- Domain type files use specific names (`domain/routing.ts`), never `types.ts`
-- `index.ts` only calls adapter registration + `app.listen()`
-- Simple services can flatten; use full layers when business logic grows
+- Do not introduce abstractions unless they provide clear value.
+- Prefer simple code over strict architectural purity.
+- Keep business logic in `domain`.
+- Keep use-case orchestration in `application`.
+- Keep HTTP-specific concerns (schemas, request/response mapping) in `adapters`.
+- Keep Fastify, configuration, external services, and technical details in `infrastructure`.
+- Avoid creating repositories, services, DTOs, or interfaces unless there is a concrete need.
+- For small features, favor readability and maintainability over additional layers.
+
+### Rule of Thumb
+
+If a component would still exist without HTTP, Fastify, YAML, or environment variables, it likely belongs in `domain` or `application`.
+
+If it depends on a framework, protocol, or external system, it belongs in `adapters` or `infrastructure`.
 
 ## Testing
 
 No test suite yet. Verify manually:
+
 ```bash
 curl http://127.0.0.1:3001/hello
 curl http://127.0.0.1:3000/hello
