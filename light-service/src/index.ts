@@ -1,6 +1,6 @@
-import { createServer } from "./server.js";
-import { config } from "./config.js";
-import { registerHelloRoute } from "./adapters/routes/hello.js";
+import { createServer } from "./infrastructure/fastify/create-server";
+import { config } from "./infrastructure/config/config-loader";
+import { registerHelloRoute } from "./infrastructure/fastify/register-hello-route";
 
 const { PORT, HOST } = config;
 
