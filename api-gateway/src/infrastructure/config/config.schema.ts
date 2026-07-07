@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const EnvSchema = z.object({
+export const EnvConfigSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   HOST: z.string().default("127.0.0.1"),
   BACKENDS: z.string().optional(),
@@ -9,4 +9,9 @@ export const EnvSchema = z.object({
   ROUTES_FILE: z.string().default("routes.yaml"),
 });
 
-export type EnvConfig = z.infer<typeof EnvSchema>;
+export type EnvConfig = z.infer<typeof EnvConfigSchema>;
+
+export type Config = EnvConfig & {
+  fallbackBackends: readonly URL[];
+  routes?: Record<string, URL[]>;
+};

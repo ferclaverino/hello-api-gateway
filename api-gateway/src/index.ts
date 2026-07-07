@@ -1,9 +1,11 @@
 import { createServer } from "./server";
-import { config } from "./config";
+import { config } from "./infrastructure/config/config-loader";
 import { registerProxyHook } from "./adapters/hooks/proxy-hook";
 import { registerHealthRoute } from "./adapters/routes/health";
+import { RouteTable } from "./domain/route-table";
 
-const { PORT, HOST, backends, routeTable } = config;
+const { PORT, HOST, fallbackBackends, routes } = config;
+const routeTable = routes ? new RouteTable(routes) : undefined;
 
 const app = createServer();
 
@@ -11,7 +13,7 @@ if (routeTable) {
   registerProxyHook(app, routeTable);
 }
 
-registerHealthRoute(app, routeTable, backends);
+registerHealthRoute(app, routeTable, fallbackBackends);
 
 app.listen({ port: PORT, host: HOST }, (err) => {
   if (err) {
@@ -24,6 +26,6 @@ app.listen({ port: PORT, host: HOST }, (err) => {
       app.log.info(`  ${entry.path} -> ${entry.backends.join(", ")}`);
     }
   } else {
-    app.log.info(`Backends: ${backends.join(", ")}`);
+    app.log.info(`Fallback backends: ${fallbackBackends.join(", ")}`);
   }
 });
