@@ -1,15 +1,15 @@
-import type { RouteEntry } from "./routing";
-import { parseBackendUrl, createRoundRobin } from "./round-robin";
+import type { RouteEntry } from "./route-entry";
+import { createRoundRobinLoadBalancer } from "./round-robin-load-balancer";
 
 export class RouteTable {
   private entries: RouteEntry[];
 
-  constructor(routes: Record<string, string[]>) {
+  constructor(routes: Record<string, URL[]>) {
     this.entries = Object.entries(routes)
       .map(([path, backends]) => ({
         path,
-        backends: backends.map(parseBackendUrl),
-        robin: createRoundRobin(backends.map(parseBackendUrl)),
+        backends,
+        loadBalancer: createRoundRobinLoadBalancer(backends),
       }))
       .sort((a, b) => b.path.length - a.path.length);
   }
