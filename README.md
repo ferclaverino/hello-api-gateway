@@ -63,12 +63,12 @@ All client traffic enters through the API gateway. The gateway dispatches synchr
 
 ## Services
 
-| Service | Description | Port |
-|---------|-------------|------|
-| `api-gateway` | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job/execute` to heavy-service | 3000 |
-| `light-service` | Minimal microservice returning instance identity — verifies load balancing works | 3001, 3002 |
-| `heavy-service` | HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout | 3010 (debug only) |
-| `heavy-worker` | Background Kafka consumer that processes work and replies asynchronously | — |
+| Service         | Description                                                                                                        | Port       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------ | ---------- |
+| `api-gateway`   | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job/execute` to heavy-service | 3000       |
+| `light-service` | Minimal microservice returning instance identity — verifies load balancing works                                   | 3001, 3002 |
+| `heavy-service` | HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout                                   | 3010       |
+| `heavy-worker`  | Background Kafka consumer that processes work and replies asynchronously                                           | —          |
 
 ## Key Patterns & Design Decisions
 
@@ -124,16 +124,16 @@ The Kafka broker runs in KRaft mode (Kafka Raft metadata mode), eliminating the 
 
 ## Tech Stack
 
-| Category | Technology | Purpose |
-|----------|-----------|---------|
-| **Language** | TypeScript 5.8 | Type-safe development with strict mode |
-| **Runtime** | Node.js 22 | ES2022 target, native fetch() |
-| **HTTP Framework** | Fastify 5.3 | High-performance HTTP server with hook-based middleware |
-| **Schema Validation** | Zod 4.4 | Runtime type validation for config, requests, and responses |
-| **Message Broker** | Apache Kafka 7.6 | Asynchronous messaging with KRaft mode (no Zookeeper) |
-| **Kafka Client** | KafkaJS 2.2 | TypeScript-native Kafka producer/consumer |
-| **Containerization** | Docker Compose | Multi-service orchestration (7 containers) |
-| **Module System** | ESNext / Node16 | Modern ESM with TypeScript path resolution |
+| Category              | Technology       | Purpose                                                     |
+| --------------------- | ---------------- | ----------------------------------------------------------- |
+| **Language**          | TypeScript 5.8   | Type-safe development with strict mode                      |
+| **Runtime**           | Node.js 22       | ES2022 target, native fetch()                               |
+| **HTTP Framework**    | Fastify 5.3      | High-performance HTTP server with hook-based middleware     |
+| **Schema Validation** | Zod 4.4          | Runtime type validation for config, requests, and responses |
+| **Message Broker**    | Apache Kafka 7.6 | Asynchronous messaging with KRaft mode (no Zookeeper)       |
+| **Kafka Client**      | KafkaJS 2.2      | TypeScript-native Kafka producer/consumer                   |
+| **Containerization**  | Docker Compose   | Multi-service orchestration (7 containers)                  |
+| **Module System**     | ESNext / Node16  | Modern ESM with TypeScript path resolution                  |
 
 ## Getting Started
 
