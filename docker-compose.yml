@@ -61,7 +61,8 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       CLUSTER_ID: "nCT8rKDqToCJ8Uw_RSN45Q"
-      KAFKA_LOG4J_LOGGER_ROOT_LEVEL: "WARN"
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+      KAFKA_LOG4J_LOGGERS: "kafka=WARN,kafka.controller=WARN,kafka.log.LogCleaner=WARN,state.change.logger=WARN,kafka.authorizer.logger=WARN,kafka.network.RequestChannel$=WARN,kafka.request.logger=WARN"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
