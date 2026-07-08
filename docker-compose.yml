@@ -42,3 +42,91 @@ services:
     depends_on:
       - light-service-1
       - light-service-2
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      CLUSTER_ID: "5d122e80-a46f-419d-bfd7-284157335506"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  heavy-service:
+    build:
+      context: ./heavy-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3010:3010"
+    environment:
+      PORT: "3010"
+      HOST: "0.0.0.0"
+      KAFKA_BROKERS: "kafka:9092"
+      KAFKA_CLIENT_ID: "heavy-service"
+      WORK_TOPIC: "heavy-work"
+      REPLY_TOPIC: "heavy-reply"
+      REPLY_CONSUMER_GROUP: "heavy-service-replies"
+      REPLY_TIMEOUT_MS: "15000"
+    volumes:
+      - ./heavy-service:/app
+      - /app/node_modules
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  heavy-worker-1:
+    build:
+      context: ./heavy-worker
+      dockerfile: Dockerfile.dev
+    environment:
+      KAFKA_BROKERS: "kafka:9092"
+      KAFKA_CLIENT_ID: "heavy-worker-1"
+      WORK_TOPIC: "heavy-work"
+      REPLY_TOPIC: "heavy-reply"
+      GROUP_ID: "heavy-workers"
+      WORKER_ID: "worker-1"
+      WORK_DELAY_MS: "10000"
+    volumes:
+      - ./heavy-worker:/app
+      - /app/node_modules
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
+
+  heavy-worker-2:
+    build:
+      context: ./heavy-worker
+      dockerfile: Dockerfile.dev
+    environment:
+      KAFKA_BROKERS: "kafka:9092"
+      KAFKA_CLIENT_ID: "heavy-worker-2"
+      WORK_TOPIC: "heavy-work"
+      REPLY_TOPIC: "heavy-reply"
+      GROUP_ID: "heavy-workers"
+      WORKER_ID: "worker-2"
+      WORK_DELAY_MS: "10000"
+    volumes:
+      - ./heavy-worker:/app
+      - /app/node_modules
+    restart: unless-stopped
+    depends_on:
+      kafka:
+        condition: service_healthy
