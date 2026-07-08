@@ -8,6 +8,6 @@ export function buildUpstreamHeaders(
       headers.set(key, Array.isArray(value) ? value.join(", ") : value);
     }
   }
-  headers.set("host", new URL(backendUrl).host);
+  headers.set("host", backendUrl.host);
   return headers;
 }

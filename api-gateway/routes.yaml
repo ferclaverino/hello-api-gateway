@@ -2,5 +2,7 @@
 # Maps path prefixes to backend server lists (round-robin within each route)
 routes:
   /hello:
-    - http://light-service-1:3001
-    - http://light-service-2:3002
+    - http://light-service-1:3001/hello
+    - http://light-service-2:3002/hello
+  /job/execute:
+    - http://heavy-service:3010/execute
