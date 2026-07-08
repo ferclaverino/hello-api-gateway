@@ -191,7 +191,7 @@ curl http://127.0.0.1:3000/hello
 # {"message":"Hello from light-service!","instance":"127.0.0.1:3002"}
 
 # Heavy work via gateway — blocks ~10s while worker processes
-curl -X POST http://127.0.0.1:3000/job/execute
+curl -X POST http://127.0.0.1:3000/job/execute -H "Content-Type: application/json" -d '{"task":"my-task"}'
 # {"status":"completed","workerId":"worker-1","duration":"10003ms"}
 
 # Health check
