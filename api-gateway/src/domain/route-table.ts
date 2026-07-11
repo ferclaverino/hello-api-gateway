@@ -1,5 +1,5 @@
 import type { RouteEntry } from "./route-entry";
-import { createRoundRobinLoadBalancer } from "./round-robin-load-balancer";
+import { RoundRobinLoadBalancer } from "./round-robin-load-balancer";
 
 export class RouteTable {
   private entries: RouteEntry[];
@@ -9,7 +9,7 @@ export class RouteTable {
       .map(([path, backends]) => ({
         path,
         backends,
-        loadBalancer: createRoundRobinLoadBalancer(backends),
+        loadBalancer: new RoundRobinLoadBalancer(backends),
       }))
       .sort((a, b) => b.path.length - a.path.length);
   }
