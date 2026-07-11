@@ -2,11 +2,23 @@ import { createServer } from "./infrastructure/fastify/create-server";
 import { config } from "./infrastructure/config/config-loader";
 import { registerExecuteRoute } from "./infrastructure/fastify/register-execute-route";
 import { connectKafka, disconnectKafka } from "./infrastructure/kafka/kafka-connection";
-import { startReplyConsumer, stopReplyConsumer } from "./infrastructure/kafka/reply-consumer";
+import {
+  startReplyConsumer,
+  stopReplyConsumer,
+  registerPending,
+  rejectPending,
+} from "./infrastructure/kafka/reply-consumer";
+import { publishWork } from "./infrastructure/kafka/work-producer";
+import { RequestReply } from "./application/request-reply";
 
 const { PORT, HOST } = config;
 
 const app = createServer();
+
+const requestReply = new RequestReply(
+  { publishWork, registerPending, rejectPending },
+  config.REPLY_TIMEOUT_MS,
+);
 
 async function main() {
   await connectKafka();
@@ -15,7 +27,7 @@ async function main() {
   await startReplyConsumer();
   app.log.info("Reply consumer started");
 
-  registerExecuteRoute(app);
+  registerExecuteRoute(app, requestReply);
 
   await app.listen({ port: PORT, host: HOST });
   app.log.info(`Heavy service listening on port ${PORT}`);

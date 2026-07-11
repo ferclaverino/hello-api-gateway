@@ -81,7 +81,7 @@ domain ← application ← adapters ← infrastructure
 ```
 
 - **domain** — core business concepts and rules (pure functions, no framework dependencies)
-- **application** — use-case orchestration (e.g., execute-use-case with timeout racing)
+- **application** — use-case orchestration via the `RequestReply` class (timeout racing, ports injected at the composition root)
 - **adapters** — protocol-specific concerns (Zod schemas, request/response mappers)
 - **infrastructure** — framework integration (Fastify, KafkaJS, config, logging)
 
@@ -216,7 +216,7 @@ curl http://127.0.0.1:3000/health
 ├── heavy-service/                # HTTP-to-Kafka bridge
 │   └── src/
 │       ├── domain/               # WorkPayload, WorkReply interfaces
-│       ├── application/          # executeUseCase (timeout racing, pending registry)
+│       ├── application/          # RequestReply class (timeout racing, pending registry)
 │       ├── adapters/             # Execute endpoint schemas + mappers
 │       └── infrastructure/       # Fastify server, Kafka client, producer, consumer
 │
