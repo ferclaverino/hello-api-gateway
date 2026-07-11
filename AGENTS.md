@@ -2,10 +2,12 @@
 
 ## Project Overview
 
-Two Fastify + TypeScript services:
+Four Fastify + TypeScript services:
 
 - `light-service/` — Hello world microservice
 - `api-gateway/` — Round-robin load balancing proxy
+- `heavy-service/` — Dispatches long-running jobs to workers over Kafka and awaits replies
+- `heavy-worker/` — Consumes job requests from Kafka and publishes replies
 
 ## Quick Start
 
@@ -46,6 +48,7 @@ Dependency direction must always point inward.
 - Keep Fastify, configuration, external services, and technical details in `infrastructure`.
 - Avoid creating repositories, services, DTOs, or interfaces unless there is a concrete need.
 - For small features, favor readability and maintainability over additional layers.
+- Prefer `class implements <Interface>` over factory functions or closures for any interface that declares methods; reserve object literals for pure data DTOs.
 
 ### Rule of Thumb
 
