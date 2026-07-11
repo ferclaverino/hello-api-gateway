@@ -10,7 +10,7 @@ type PendingEntry = {
 
 const pending = new Map<string, PendingEntry>();
 
-export function registerPending(
+export function registerJob(
   correlationId: string,
 ): Promise<WorkReply> {
   return new Promise<WorkReply>((resolve, reject) => {
@@ -18,7 +18,7 @@ export function registerPending(
   });
 }
 
-export function rejectPending(correlationId: string, err: Error): void {
+export function rejectJob(correlationId: string, err: Error): void {
   const entry = pending.get(correlationId);
   if (entry) {
     pending.delete(correlationId);

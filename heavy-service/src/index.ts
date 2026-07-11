@@ -5,10 +5,10 @@ import { connectKafka, disconnectKafka } from "./infrastructure/kafka/kafka-conn
 import {
   startReplyConsumer,
   stopReplyConsumer,
-  registerPending,
-  rejectPending,
+  registerJob,
+  rejectJob,
 } from "./infrastructure/kafka/reply-consumer";
-import { publishWork } from "./infrastructure/kafka/work-producer";
+import { startJob } from "./infrastructure/kafka/work-producer";
 import { RequestReply } from "./application/request-reply";
 
 const { PORT, HOST } = config;
@@ -16,7 +16,7 @@ const { PORT, HOST } = config;
 const app = createServer();
 
 const requestReply = new RequestReply(
-  { publishWork, registerPending, rejectPending },
+  { startJob, registerJob, rejectJob },
   config.REPLY_TIMEOUT_MS,
 );
 

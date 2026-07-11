@@ -3,7 +3,7 @@ import { producer } from "./kafka-connection";
 import { config } from "../config/config-loader";
 import type { WorkPayload } from "../../domain/execute-request";
 
-export async function publishWork(
+export async function startJob(
   payload: WorkPayload,
 ): Promise<string> {
   const correlationId = uuid();

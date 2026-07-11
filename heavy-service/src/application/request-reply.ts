@@ -1,5 +1,5 @@
 import type { WorkPayload, WorkReply } from "../domain/execute-request";
-import type { RequestReplyPorts } from "./ports/request-reply-ports";
+import type { WorkerPorts } from "./ports/worker-ports";
 
 export class TimeoutError extends Error {
   constructor(public readonly jobId: string) {
@@ -10,19 +10,19 @@ export class TimeoutError extends Error {
 
 export class RequestReply {
   constructor(
-    private readonly ports: RequestReplyPorts,
+    private readonly ports: WorkerPorts,
     private readonly timeoutMs: number,
   ) {}
 
   async execute(
     payload: WorkPayload,
   ): Promise<{ jobId: string; reply: WorkReply }> {
-    const jobId = await this.ports.publishWork(payload);
-    const replyPromise = this.ports.registerPending(jobId);
+    const jobId = await this.ports.startJob(payload);
+    const replyPromise = this.ports.registerJob(jobId);
 
     const timeout = new Promise<never>((_, reject) => {
       setTimeout(() => {
-        this.ports.rejectPending(jobId, new TimeoutError(jobId));
+        this.ports.rejectJob(jobId, new TimeoutError(jobId));
       }, this.timeoutMs);
     });
 
