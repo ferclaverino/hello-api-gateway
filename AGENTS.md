@@ -2,12 +2,11 @@
 
 ## Project Overview
 
-Four Fastify + TypeScript services:
+Three Fastify + TypeScript services:
 
 - [`light-service/`](light-service/README.md) — Hello world microservice for load balancing verification
 - [`api-gateway/`](api-gateway/README.md) — Round-robin load balancing proxy with YAML-configurable routing
-- [`heavy-service/`](heavy-service/README.md) — HTTP-to-Kafka bridge implementing request-reply with correlation IDs
-- [`heavy-worker/`](heavy-worker/README.md) — Background Kafka consumer that processes work asynchronously
+- [`heavy-service/`](heavy-service/README.md) — HTTP-to-Kafka bridge (`src/service.ts`) and background Kafka worker (`src/worker.ts`) in a single codebase; both share the same `domain/` and `infrastructure/` layers
 
 ## Conventions
 
@@ -62,3 +61,5 @@ curl http://127.0.0.1:3000/health
 npm run build    # Compiles TypeScript to dist/
 npm run dev      # Runs with tsx (no build needed)
 ```
+
+`heavy-service` has two entry points: `npm run dev:service` and `npm run dev:worker`.

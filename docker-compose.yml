@@ -82,6 +82,7 @@ services:
     build:
       context: ./heavy-service
       dockerfile: Dockerfile.dev
+    command: npm run dev:service
     ports:
       - "3010:3010"
     environment:
@@ -106,8 +107,9 @@ services:
 
   heavy-worker-1:
     build:
-      context: ./heavy-worker
+      context: ./heavy-service
       dockerfile: Dockerfile.dev
+    command: npm run dev:worker
     environment:
       KAFKA_BROKERS: "kafka:9092"
       KAFKA_CLIENT_ID: "heavy-worker-1"
@@ -117,7 +119,7 @@ services:
       WORKER_ID: "worker-1"
       WORK_DELAY_MS: "10000"
     volumes:
-      - ./heavy-worker:/app
+      - ./heavy-service:/app
     restart: unless-stopped
     depends_on:
       kafka:
@@ -125,8 +127,9 @@ services:
 
   heavy-worker-2:
     build:
-      context: ./heavy-worker
+      context: ./heavy-service
       dockerfile: Dockerfile.dev
+    command: npm run dev:worker
     environment:
       KAFKA_BROKERS: "kafka:9092"
       KAFKA_CLIENT_ID: "heavy-worker-2"
@@ -136,7 +139,7 @@ services:
       WORKER_ID: "worker-2"
       WORK_DELAY_MS: "10000"
     volumes:
-      - ./heavy-worker:/app
+      - ./heavy-service:/app
     restart: unless-stopped
     depends_on:
       kafka:

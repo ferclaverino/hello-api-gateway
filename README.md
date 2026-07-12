@@ -16,8 +16,7 @@ This project implements a multi-service system designed to showcase production-g
 
 - An **API gateway** that serves as the single entry point, routing synchronous traffic across load-balanced backend instances and dispatching heavy work to an async pipeline
 - A **lightweight service** that serves as a horizontal-scalability proof of concept
-- A **heavy service** that bridges HTTP to Kafka, implementing the request-reply messaging pattern with correlation IDs and timeout handling
-- **Background workers** that consume work from Kafka topics and reply asynchronously, demonstrating consumer-group-based horizontal scaling
+- A **heavy service** that bridges HTTP to Kafka, implementing the request-reply messaging pattern with correlation IDs and timeout handling, and ships a **background worker** process (`src/worker.ts`) that consumes work from Kafka topics and replies asynchronously, demonstrating consumer-group-based horizontal scaling — both processes share a single codebase
 
 The entire stack runs via Docker Compose (7 containers) and is fully observable through health endpoints and response metadata.
 
@@ -67,8 +66,7 @@ All client traffic enters through the API gateway. The gateway dispatches synchr
 | --------------- | ------------------------------------------------------------------------------------------------------------------ | ---------- |
 | `api-gateway`   | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job/execute` to heavy-service | 3000       |
 | `light-service` | Minimal microservice returning instance identity — verifies load balancing works                                   | 3001, 3002 |
-| `heavy-service` | HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout                                   | 3010       |
-| `heavy-worker`  | Background Kafka consumer that processes work and replies asynchronously                                           | —          |
+| `heavy-service` | HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout; also ships the background Kafka worker process (`src/worker.ts`) | 3010       |
 
 ## Key Patterns & Design Decisions
 
@@ -148,7 +146,7 @@ The Kafka broker runs in KRaft mode (Kafka Raft metadata mode), eliminating the 
 docker compose up
 ```
 
-This starts all 7 containers: 1 Kafka broker, 2 light-service instances, 1 api-gateway, 1 heavy-service, and 2 heavy-workers.
+This starts all 7 containers: 1 Kafka broker, 2 light-service instances, 1 api-gateway, 1 heavy-service (HTTP bridge), and 2 heavy-worker processes (scaled consumers built from the same `heavy-service/` codebase).
 
 ### Manual Start (Local Development)
 
@@ -164,11 +162,11 @@ cd api-gateway && npm install && npm start          # port 3000
 docker compose up kafka
 
 # Terminal 4 — heavy-service (accessed via gateway)
-cd heavy-service && npm install && npm start        # port 3010
+cd heavy-service && npm install && npm run start:service  # port 3010
 
-# Terminal 5 — heavy-workers
-cd heavy-worker && npm install && npm start         # worker-1
-WORKER_ID=worker-2 npm start                        # worker-2
+# Terminal 5 — heavy-workers (same codebase, different process)
+cd heavy-service && npm run start:worker                  # worker-1
+WORKER_ID=worker-2 npm run start:worker                   # worker-2
 ```
 
 ### Build
@@ -213,17 +211,14 @@ curl http://127.0.0.1:3000/health
 │       ├── adapters/             # Hello endpoint schemas + mappers
 │       └── infrastructure/       # Fastify server, config
 │
-├── heavy-service/                # HTTP-to-Kafka bridge
+├── heavy-service/                # HTTP-to-Kafka bridge + background Kafka worker
 │   └── src/
-│       ├── domain/               # WorkPayload, WorkReply interfaces
+│       ├── service.ts             # HTTP service entry point
+│       ├── worker.ts              # Background worker entry point
+│       ├── domain/               # WorkPayload, WorkReply, Job interfaces
 │       ├── application/          # RequestReply class (timeout racing, pending registry)
 │       ├── adapters/             # Execute endpoint schemas + mappers
-│       └── infrastructure/       # Fastify server, Kafka client, producer, consumer
-│
-├── heavy-worker/                 # Background Kafka worker
-│   └── src/
-│       ├── domain/               # WorkPayload, WorkReply interfaces
-│       └── infrastructure/       # Kafka consumer + producer, config
+│       └── infrastructure/       # Fastify server, Kafka client/producer/consumer, config
 │
 └── docker-compose.yml            # Full stack orchestration (7 containers)
 ```
