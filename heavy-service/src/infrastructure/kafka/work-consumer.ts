@@ -1,6 +1,9 @@
-import { consumer, producer } from "./kafka-client";
+import { kafka } from "./kafka-client";
 import { config } from "../config/config-loader";
-import type { WorkPayload, WorkReply } from "../../domain/work-job";
+import type { WorkPayload, WorkReply } from "../../domain/execute-request";
+
+const consumer = kafka.consumer({ groupId: config.GROUP_ID });
+const producer = kafka.producer({ allowAutoTopicCreation: false });
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 

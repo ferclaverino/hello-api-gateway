@@ -11,6 +11,9 @@ export const EnvConfigSchema = z.object({
   REPLY_TIMEOUT_MS: z.coerce.number().int().positive().default(15000),
   REDIS_URL: z.string().default("redis://127.0.0.1:6379"),
   JOB_REQUESTS_TOPIC: z.string().default("job.requests"),
+  GROUP_ID: z.string().default("heavy-workers"),
+  WORKER_ID: z.string().default("worker-1"),
+  WORK_DELAY_MS: z.coerce.number().int().positive().default(10000),
 });
 
 export type EnvConfig = z.infer<typeof EnvConfigSchema>;

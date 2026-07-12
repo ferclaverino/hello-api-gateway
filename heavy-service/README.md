@@ -1,6 +1,6 @@
 # heavy-service
 
-HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout handling.
+HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout handling, plus a background Kafka worker process. Both processes share a single codebase (`src/service.ts` and `src/worker.ts`).
 
 [← Back to main README](../README.md)
 
@@ -13,10 +13,11 @@ npm install
 ## Run
 
 ```bash
-npm start
+npm run start:service   # HTTP bridge (default port 3010)
+npm run start:worker    # background Kafka worker
 ```
 
-The service starts on `http://127.0.0.1:3010` by default.
+The service starts on `http://127.0.0.1:3010` by default. Multiple worker instances can run concurrently with distinct `WORKER_ID` values.
 
 ## Endpoints
 
@@ -40,18 +41,24 @@ The service starts on `http://127.0.0.1:3010` by default.
 | `REPLY_TIMEOUT_MS` | `15000` | Timeout for waiting for worker reply (ms) |
 | `REDIS_URL` | `redis://127.0.0.1:6379` | Redis connection URL |
 | `JOB_REQUESTS_TOPIC` | `job.requests` | Kafka topic for job requests |
+| `GROUP_ID` | `heavy-workers` | Kafka consumer group for the worker process |
+| `WORKER_ID` | `worker-1` | Identifier for the worker process instance |
+| `WORK_DELAY_MS` | `10000` | Simulated work duration in the worker process (ms) |
 
 ### Examples
 
 ```bash
 # Run with default configuration
-npm start
+npm run start:service
 
 # Run with custom Kafka brokers
-KAFKA_BROKERS=broker1:9092,broker2:9092 npm start
+KAFKA_BROKERS=broker1:9092,broker2:9092 npm run start:service
 
 # Run with custom timeout
-REPLY_TIMEOUT_MS=30000 npm start
+REPLY_TIMEOUT_MS=30000 npm run start:service
+
+# Run a worker instance
+WORKER_ID=worker-1 npm run start:worker
 ```
 
 ## Test
