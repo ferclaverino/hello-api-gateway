@@ -23,6 +23,8 @@ The service starts on `http://127.0.0.1:3010` by default.
 | Endpoint | Description |
 |----------|-------------|
 | `POST /job/execute` | Dispatches work to Kafka and waits for reply with correlation ID |
+| `POST /start` | Starts a background job, publishes it to Kafka, and returns the job ID |
+| `GET /get?jobId=<id>` | Retrieves the status and result of a job by ID |
 
 ## Environment Variables
 
@@ -36,6 +38,8 @@ The service starts on `http://127.0.0.1:3010` by default.
 | `REPLY_TOPIC` | `heavy-reply` | Kafka topic for receiving replies |
 | `REPLY_CONSUMER_GROUP` | `heavy-service-replies` | Consumer group for reply topic |
 | `REPLY_TIMEOUT_MS` | `15000` | Timeout for waiting for worker reply (ms) |
+| `REDIS_URL` | `redis://127.0.0.1:6379` | Redis connection URL |
+| `JOB_REQUESTS_TOPIC` | `job.requests` | Kafka topic for job requests |
 
 ### Examples
 
@@ -57,3 +61,11 @@ curl -X POST http://127.0.0.1:3010/job/execute -H "Content-Type: application/jso
 ```
 
 The service will dispatch the work to Kafka and wait for a worker to process it and send a reply. If no reply arrives within the timeout period (default 15s), the request will fail with HTTP 504.
+
+```bash
+# Start a background job
+curl -X POST http://127.0.0.1:3010/start
+
+# Get job status
+curl "http://127.0.0.1:3010/get?jobId=<jobId>"
+```
