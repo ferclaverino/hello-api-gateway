@@ -30,9 +30,7 @@ export class ExecuteJob {
   }
 
   private async makeResult(workerId: string, delayMs: number): Promise<Result> {
-    const start = Date.now();
-    await this.sleep(delayMs);
-    const durationMs = Date.now() - start;
+    const durationMs = await this.sleep(delayMs);
 
     return new Result(
       { message: "Job completed successfully" },
@@ -41,7 +39,9 @@ export class ExecuteJob {
     );
   }
 
-  private async sleep(ms: number) {
-    return new Promise<void>((resolve) => setTimeout(resolve, ms));
+  private async sleep(ms: number): Promise<number> {
+    const start = Date.now();
+    await new Promise<void>((resolve) => setTimeout(resolve, ms));
+    return Date.now() - start;
   }
 }
