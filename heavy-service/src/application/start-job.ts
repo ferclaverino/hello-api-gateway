@@ -5,7 +5,7 @@ import { JobRepository } from "./ports/job-repository";
 
 export class StartJob {
   constructor(
-    private jobQueue: Queue<Job>,
+    private jobRequestQueue: Queue<Job>,
     private jobRepository: JobRepository,
   ) {}
 
@@ -13,7 +13,7 @@ export class StartJob {
     const jobId = this.generateJobId();
     const job = new Job(jobId);
 
-    this.jobQueue.publish(job);
+    this.jobRequestQueue.publish(job);
     this.jobRepository.save(job);
 
     return jobId;
