@@ -2,6 +2,8 @@
 
 A simple Fastify "Hello World" microservice.
 
+[← Back to main README](../README.md)
+
 ## Setup
 
 ```bash

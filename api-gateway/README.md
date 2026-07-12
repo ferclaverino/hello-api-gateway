@@ -2,6 +2,8 @@
 
 A round-robin load balancing proxy built with Fastify.
 
+[← Back to main README](../README.md)
+
 ## Setup
 
 ```bash
