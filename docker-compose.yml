@@ -10,7 +10,6 @@ services:
       HOST: "0.0.0.0"
     volumes:
       - ./light-service:/app
-      - /app/node_modules
     restart: unless-stopped
 
   light-service-2:
@@ -24,7 +23,6 @@ services:
       HOST: "0.0.0.0"
     volumes:
       - ./light-service:/app
-      - /app/node_modules
     restart: unless-stopped
 
   api-gateway:
@@ -37,7 +35,6 @@ services:
       - .env
     volumes:
       - ./api-gateway:/app
-      - /app/node_modules
     restart: unless-stopped
     depends_on:
       - light-service-1
@@ -70,6 +67,17 @@ services:
       timeout: 5s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   heavy-service:
     build:
       context: ./heavy-service
@@ -85,12 +93,15 @@ services:
       REPLY_TOPIC: "heavy-reply"
       REPLY_CONSUMER_GROUP: "heavy-service-replies"
       REPLY_TIMEOUT_MS: "15000"
+      REDIS_URL: "redis://redis:6379"
+      JOB_REQUESTS_TOPIC: "job.requests"
     volumes:
       - ./heavy-service:/app
-      - /app/node_modules
     restart: unless-stopped
     depends_on:
       kafka:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   heavy-worker-1:
@@ -107,7 +118,6 @@ services:
       WORK_DELAY_MS: "10000"
     volumes:
       - ./heavy-worker:/app
-      - /app/node_modules
     restart: unless-stopped
     depends_on:
       kafka:
@@ -127,7 +137,6 @@ services:
       WORK_DELAY_MS: "10000"
     volumes:
       - ./heavy-worker:/app
-      - /app/node_modules
     restart: unless-stopped
     depends_on:
       kafka:
