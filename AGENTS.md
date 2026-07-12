@@ -4,20 +4,10 @@
 
 Four Fastify + TypeScript services:
 
-- `light-service/` — Hello world microservice
-- `api-gateway/` — Round-robin load balancing proxy
-- `heavy-service/` — Dispatches long-running jobs to workers over Kafka and awaits replies
-- `heavy-worker/` — Consumes job requests from Kafka and publishes replies
-
-## Quick Start
-
-```bash
-# Terminal 1
-cd light-service && npm install && npm start
-
-# Terminal 2
-cd api-gateway && npm install && npm start
-```
+- [`light-service/`](light-service/README.md) — Hello world microservice for load balancing verification
+- [`api-gateway/`](api-gateway/README.md) — Round-robin load balancing proxy with YAML-configurable routing
+- [`heavy-service/`](heavy-service/README.md) — HTTP-to-Kafka bridge implementing request-reply with correlation IDs
+- [`heavy-worker/`](heavy-worker/README.md) — Background Kafka consumer that processes work asynchronously
 
 ## Conventions
 
