@@ -1,3 +1,5 @@
+import { Result } from "./result";
+
 export type JobId = string;
 
 export enum JobStatus {
@@ -9,14 +11,17 @@ export enum JobStatus {
 
 export interface JobState {
   status: JobStatus;
-  result: unknown;
+  result: Result | null;
 }
 
 export class Job {
   private status: JobStatus = JobStatus.Pending;
-  result: unknown = null;
+  private result: Result | null = null;
 
-  constructor(readonly jobId: JobId, state?: JobState) {
+  constructor(
+    readonly jobId: JobId,
+    state?: JobState,
+  ) {
     if (state) {
       this.status = state.status;
       this.result = state.result;
@@ -27,7 +32,7 @@ export class Job {
     this.status = JobStatus.InProgress;
   }
 
-  complete(result: unknown) {
+  complete(result: Result) {
     this.status = JobStatus.Completed;
     this.result = result;
   }
@@ -38,5 +43,9 @@ export class Job {
 
   getStatus(): JobStatus {
     return this.status;
+  }
+
+  getResult(): Result | null {
+    return this.result;
   }
 }

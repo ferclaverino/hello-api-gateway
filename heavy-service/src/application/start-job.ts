@@ -1,11 +1,11 @@
 import { v7 as uuidv7 } from "uuid";
 import { Job, JobId } from "../domain/job";
-import { JobQueue } from "./ports/job-queue";
+import { Queue } from "./ports/job-queue";
 import { JobRepository } from "./ports/job-repository";
 
 export class StartJob {
   constructor(
-    private jobCommands: JobQueue,
+    private jobQueue: Queue<Job>,
     private jobRepository: JobRepository,
   ) {}
 
@@ -13,7 +13,7 @@ export class StartJob {
     const jobId = this.generateJobId();
     const job = new Job(jobId);
 
-    this.jobCommands.publish(job);
+    this.jobQueue.publish(job);
     this.jobRepository.save(job);
 
     return jobId;
