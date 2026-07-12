@@ -19,6 +19,6 @@ export class StartJob {
   }
 
   private generateJobId(): JobId {
-    throw new Error("Method not implemented.");
+    return Date.now().toString(36) + Math.random().toString(36).slice(2);
   }
 }

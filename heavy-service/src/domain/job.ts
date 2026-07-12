@@ -7,11 +7,21 @@ export enum JobStatus {
   Failed = "failed",
 }
 
+export interface JobState {
+  status: JobStatus;
+  result: unknown;
+}
+
 export class Job {
   private status: JobStatus = JobStatus.Pending;
   result: unknown = null;
 
-  constructor(readonly jobId: JobId) {}
+  constructor(readonly jobId: JobId, state?: JobState) {
+    if (state) {
+      this.status = state.status;
+      this.result = state.result;
+    }
+  }
 
   start() {
     this.status = JobStatus.InProgress;
