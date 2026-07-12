@@ -1,3 +1,4 @@
+import { v7 as uuidv7 } from "uuid";
 import { Job, JobId } from "../domain/job";
 import { JobQueue } from "./ports/job-queue";
 import { JobRepository } from "./ports/job-repository";
@@ -19,6 +20,6 @@ export class StartJob {
   }
 
   private generateJobId(): JobId {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2);
+    return uuidv7();
   }
 }

@@ -8,5 +8,5 @@ export async function connectRedis(): Promise<void> {
 }
 
 export async function disconnectRedis(): Promise<void> {
-  await redis.disconnect().catch(() => {});
+  await redis.close().catch(() => {});
 }
