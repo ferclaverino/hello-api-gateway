@@ -39,6 +39,7 @@ services:
     depends_on:
       - light-service-1
       - light-service-2
+      - heavy-service
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
@@ -62,7 +63,13 @@ services:
       KAFKA_LOG4J_LOGGERS: "kafka=WARN,kafka.controller=WARN,kafka.log.LogCleaner=WARN,state.change.logger=WARN,kafka.authorizer.logger=WARN,kafka.network.RequestChannel$=WARN,kafka.request.logger=WARN"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      test:
+        [
+          "CMD",
+          "kafka-broker-api-versions",
+          "--bootstrap-server",
+          "localhost:9092",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -124,6 +131,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      redis:
+        condition: service_healthy
 
   heavy-worker-2:
     build:
@@ -143,4 +152,6 @@ services:
     restart: unless-stopped
     depends_on:
       kafka:
+        condition: service_healthy
+      redis:
         condition: service_healthy
