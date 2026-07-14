@@ -24,8 +24,8 @@ The service starts on `http://127.0.0.1:3010` by default. Multiple worker instan
 | Endpoint | Description |
 |----------|-------------|
 | `POST /job/execute` | Dispatches work to Kafka and waits for reply with correlation ID |
-| `POST /start` | Starts a background job, publishes it to Kafka, and returns the job ID |
-| `GET /get?jobId=<id>` | Retrieves the status and result of a job by ID |
+| `POST /job` | Starts a background job, publishes it to Kafka, and returns the job ID |
+| `GET /job/:jobId` | Retrieves the status and result of a job by ID |
 
 ## Environment Variables
 
@@ -71,8 +71,8 @@ The service will dispatch the work to Kafka and wait for a worker to process it 
 
 ```bash
 # Start a background job
-curl -X POST http://127.0.0.1:3010/start
+curl -X POST http://127.0.0.1:3010/job
 
 # Get job status
-curl "http://127.0.0.1:3010/get?jobId=<jobId>"
+curl http://127.0.0.1:3010/job/<jobId>
 ```

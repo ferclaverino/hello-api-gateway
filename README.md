@@ -3,6 +3,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?logo=typescript)
 ![Fastify](https://img.shields.io/badge/Fastify-5.3-000000?logo=fastify)
 ![Apache Kafka](https://img.shields.io/badge/Apache_Kafka-7.6-231F20?logo=apachekafka)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)
 ![Zod](https://img.shields.io/badge/Zod-4.4-3068B7?logo=zod)
 ![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js)
@@ -18,7 +19,7 @@ This project implements a multi-service system designed to showcase production-g
 - A **lightweight service** that serves as a horizontal-scalability proof of concept
 - A **heavy service** that bridges HTTP to Kafka, implementing the request-reply messaging pattern with correlation IDs and timeout handling, and ships a **background worker** process (`src/worker.ts`) that consumes work from Kafka topics and replies asynchronously, demonstrating consumer-group-based horizontal scaling — both processes share a single codebase
 
-The entire stack runs via Docker Compose (7 containers) and is fully observable through health endpoints and response metadata.
+The entire stack runs via Docker Compose (8 containers) and is fully observable through health endpoints and response metadata.
 
 ## Architecture
 
@@ -30,7 +31,7 @@ The entire stack runs via Docker Compose (7 containers) and is fully observable 
                                 │   YAML-configurable routing         │
                                 │                                     │
                                 │   /hello        → light-service     │
-                                │   /job/execute  → heavy-service     │
+                                │   /job          → heavy-service     │
                                 └──────┬──────────┬──────────┬────────┘
                                        │          │          │
                           ┌────────────┘          │          └────────────┐
@@ -56,6 +57,11 @@ The entire stack runs via Docker Compose (7 containers) and is fully observable 
                                           │  Consumer Group  │                   │  Consumer Group  │
                                           │  "heavy-workers" │                   │  "heavy-workers" │
                                           └──────────────────┘                   └──────────────────┘
+                                ┌──────────────────┐
+                                │      Redis        │
+                                │  (port 6379)      │
+                                │  Job state store  │
+                                └──────────────────┘
 ```
 
 All client traffic enters through the API gateway. The gateway dispatches synchronous requests to light-service via round-robin load balancing and routes heavy work to the heavy-service, which bridges into Kafka's async request-reply pipeline.
@@ -64,7 +70,7 @@ All client traffic enters through the API gateway. The gateway dispatches synchr
 
 | Service         | Description                                                                                                        | Port       |
 | --------------- | ------------------------------------------------------------------------------------------------------------------ | ---------- |
-| `api-gateway`   | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job/execute` to heavy-service | 3000       |
+| `api-gateway`   | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job` to heavy-service | 3000       |
 | `light-service` | Minimal microservice returning instance identity — verifies load balancing works                                   | 3001, 3002 |
 | `heavy-service` | HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout; also ships the background Kafka worker process (`src/worker.ts`) | 3010       |
 
@@ -99,7 +105,7 @@ Route configuration is loaded from `routes.yaml` at startup, supporting YAML-dri
 
 The heavy service implements the **request-reply over messaging** pattern for work that exceeds typical HTTP timeouts:
 
-1. Client sends `POST /job/execute` to the API gateway
+1. Client sends `POST /job` (or `POST /job/execute` for synchronous) to the API gateway
 2. Gateway forwards to heavy-service, which publishes work to the `heavy-work` topic with a UUID correlation ID
 3. Heavy-service registers a pending Promise keyed by correlation ID
 4. Worker consumes the message, performs work, publishes reply to `heavy-reply` with the same correlation ID
@@ -130,7 +136,8 @@ The Kafka broker runs in KRaft mode (Kafka Raft metadata mode), eliminating the 
 | **Schema Validation** | Zod 4.4          | Runtime type validation for config, requests, and responses |
 | **Message Broker**    | Apache Kafka 7.6 | Asynchronous messaging with KRaft mode (no Zookeeper)       |
 | **Kafka Client**      | KafkaJS 2.2      | TypeScript-native Kafka producer/consumer                   |
-| **Containerization**  | Docker Compose   | Multi-service orchestration (7 containers)                  |
+| **State Store**       | Redis 7          | Job state storage for background job tracking               |
+| **Containerization**  | Docker Compose   | Multi-service orchestration (8 containers)                  |
 | **Module System**     | ESNext / Node16  | Modern ESM with TypeScript path resolution                  |
 
 ## Getting Started
@@ -146,7 +153,7 @@ The Kafka broker runs in KRaft mode (Kafka Raft metadata mode), eliminating the 
 docker compose up
 ```
 
-This starts all 7 containers: 1 Kafka broker, 2 light-service instances, 1 api-gateway, 1 heavy-service (HTTP bridge), and 2 heavy-worker processes (scaled consumers built from the same `heavy-service/` codebase).
+This starts all 8 containers: 1 Kafka broker, 1 Redis, 2 light-service instances, 1 api-gateway, 1 heavy-service (HTTP bridge), and 2 heavy-worker processes (scaled consumers built from the same `heavy-service/` codebase).
 
 ### Manual Start (Local Development)
 
@@ -158,8 +165,8 @@ PORT=3002 npm start                                 # port 3002
 # Terminal 2 — api-gateway
 cd api-gateway && npm install && npm start          # port 3000
 
-# Terminal 3 — Kafka broker (Docker)
-docker compose up kafka
+# Terminal 3 — Kafka broker + Redis (Docker)
+docker compose up kafka redis
 
 # Terminal 4 — heavy-service (accessed via gateway)
 cd heavy-service && npm install && npm run start:service  # port 3010
@@ -190,7 +197,15 @@ curl http://127.0.0.1:3000/hello
 
 # Heavy work via gateway — blocks ~10s while worker processes
 curl -X POST http://127.0.0.1:3000/job/execute -H "Content-Type: application/json" -d '{"task":"my-task"}'
-# {"status":"completed","workerId":"worker-1","duration":"10003ms"}
+# {"jobId":"...","workerId":"worker-1","durationMs":10003}
+
+# Background job — returns immediately with a job ID
+curl -X POST http://127.0.0.1:3000/job
+# {"jobId":"..."}
+
+# Get job status
+curl http://127.0.0.1:3000/job/<jobId>
+# {"jobId":"...","status":"completed","result":{...}}
 
 # Health check
 curl http://127.0.0.1:3000/health
@@ -216,11 +231,11 @@ curl http://127.0.0.1:3000/health
 │       ├── service.ts             # HTTP service entry point
 │       ├── worker.ts              # Background worker entry point
 │       ├── domain/               # WorkPayload, WorkReply, Job interfaces
-│       ├── application/          # RequestReply class (timeout racing, pending registry)
-│       ├── adapters/             # Execute endpoint schemas + mappers
-│       └── infrastructure/       # Fastify server, Kafka client/producer/consumer, config
+│       ├── application/          # RequestReply, StartJob, GetJob use cases
+│       ├── adapters/             # Execute/Job endpoint schemas + mappers
+│       └── infrastructure/       # Fastify server, Kafka client/producer/consumer, Redis, config
 │
-└── docker-compose.yml            # Full stack orchestration (7 containers)
+└── docker-compose.yml            # Full stack orchestration (8 containers)
 ```
 
 ## AI Skills
