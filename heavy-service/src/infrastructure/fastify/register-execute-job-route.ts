@@ -7,18 +7,20 @@ import {
 } from "../../adapters/execute/execute.mapper";
 import { RequestReply, TimeoutError } from "../../application/request-reply";
 
-export function registerExecuteRoute(
+export function registerExecuteJobRoute(
   app: FastifyInstance,
   requestReply: RequestReply,
 ): void {
   app.withTypeProvider<ZodTypeProvider>().route({
     method: "POST",
-    url: "/execute",
+    url: "/job/execute",
     schema: executeSchema,
     handler: async (request, reply) => {
       const { task } = request.body;
       try {
-        const { jobId, reply: workReply } = await requestReply.execute({ task });
+        const { jobId, reply: workReply } = await requestReply.execute({
+          task,
+        });
         return reply.send(toExecuteResponse(jobId, workReply));
       } catch (err) {
         if (err instanceof TimeoutError) {

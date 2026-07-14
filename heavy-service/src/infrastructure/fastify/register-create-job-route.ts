@@ -3,13 +3,13 @@ import type { ZodTypeProvider } from "@fastify/type-provider-zod";
 import { startSchema } from "../../adapters/job/start.schema";
 import { StartJob } from "../../application/start-job";
 
-export function registerStartRoute(
+export function registerCreateJobRoute(
   app: FastifyInstance,
   startJob: StartJob,
 ): void {
   app.withTypeProvider<ZodTypeProvider>().route({
     method: "POST",
-    url: "/start",
+    url: "/job",
     schema: startSchema,
     handler: async (_request, reply) => {
       const jobId = startJob.execute();

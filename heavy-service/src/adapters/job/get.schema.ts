@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-export const getQuerySchema = z.object({
+export const getParamsSchema = z.object({
   jobId: z.string().min(1),
 });
 
 export const getSchema = {
-  querystring: getQuerySchema,
+  params: getParamsSchema,
   response: {
     200: z.object({
       jobId: z.string(),

@@ -1,9 +1,12 @@
 import { createServer } from "./infrastructure/fastify/create-server";
 import { config } from "./infrastructure/config/config-loader";
-import { registerExecuteRoute } from "./infrastructure/fastify/register-execute-route";
-import { registerStartRoute } from "./infrastructure/fastify/register-start-route";
-import { registerGetRoute } from "./infrastructure/fastify/register-get-route";
-import { connectKafka, disconnectKafka } from "./infrastructure/kafka/kafka-connection";
+import { registerExecuteJobRoute } from "./infrastructure/fastify/register-execute-job-route";
+import { registerCreateJobRoute } from "./infrastructure/fastify/register-create-job-route";
+import { registerGetJobRoute } from "./infrastructure/fastify/register-get-job-route";
+import {
+  connectKafka,
+  disconnectKafka,
+} from "./infrastructure/kafka/kafka-connection";
 import {
   startReplyConsumer,
   stopReplyConsumer,
@@ -16,7 +19,10 @@ import { StartJob } from "./application/start-job";
 import { GetJob } from "./application/get-job";
 import { KafkaJobQueue } from "./infrastructure/kafka/job-queue-adapter";
 import { RedisJobRepository } from "./infrastructure/redis/job-repository-adapter";
-import { connectRedis, disconnectRedis } from "./infrastructure/redis/redis-client";
+import {
+  connectRedis,
+  disconnectRedis,
+} from "./infrastructure/redis/redis-client";
 
 const { PORT, HOST } = config;
 
@@ -42,9 +48,9 @@ async function main() {
   await startReplyConsumer();
   app.log.info("Reply consumer started");
 
-  registerExecuteRoute(app, requestReply);
-  registerStartRoute(app, startJobUseCase);
-  registerGetRoute(app, getJobUseCase);
+  registerExecuteJobRoute(app, requestReply);
+  registerCreateJobRoute(app, startJobUseCase);
+  registerGetJobRoute(app, getJobUseCase);
 
   await app.listen({ port: PORT, host: HOST });
   app.log.info(`Heavy service listening on port ${PORT}`);
