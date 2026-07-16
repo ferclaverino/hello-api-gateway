@@ -21,29 +21,24 @@ The service starts on `http://127.0.0.1:3010` by default. Multiple worker instan
 
 ## Endpoints
 
-| Endpoint | Description |
-|----------|-------------|
-| `POST /job/execute` | Dispatches work to Kafka and waits for reply with correlation ID |
-| `POST /job` | Starts a background job, publishes it to Kafka, and returns the job ID |
-| `GET /job/:jobId` | Retrieves the status and result of a job by ID |
+| Endpoint            | Description                                                            |
+| ------------------- | ---------------------------------------------------------------------- |
+| `POST /job/execute` | Dispatches work to Kafka and waits for reply with correlation ID       |
+| `POST /job`         | Starts a background job, publishes it to Kafka, and returns the job ID |
+| `GET /job/:jobId`   | Retrieves the status and result of a job by ID                         |
 
 ## Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `3010` | Server port |
-| `HOST` | `127.0.0.1` | Bind address |
-| `KAFKA_BROKERS` | `127.0.0.1:9092` | Comma-separated Kafka broker addresses |
-| `KAFKA_CLIENT_ID` | `heavy-service` | Kafka client identifier |
-| `WORK_TOPIC` | `heavy-work` | Kafka topic for dispatching work |
-| `REPLY_TOPIC` | `heavy-reply` | Kafka topic for receiving replies |
-| `REPLY_CONSUMER_GROUP` | `heavy-service-replies` | Consumer group for reply topic |
-| `REPLY_TIMEOUT_MS` | `15000` | Timeout for waiting for worker reply (ms) |
-| `REDIS_URL` | `redis://127.0.0.1:6379` | Redis connection URL |
-| `JOB_REQUESTS_TOPIC` | `job.requests` | Kafka topic for job requests |
-| `GROUP_ID` | `heavy-workers` | Kafka consumer group for the worker process |
-| `WORKER_ID` | `worker-1` | Identifier for the worker process instance |
-| `WORK_DELAY_MS` | `10000` | Simulated work duration in the worker process (ms) |
+| Variable             | Default                  | Description                                 |
+| -------------------- | ------------------------ | ------------------------------------------- |
+| `PORT`               | `3010`                   | Server port                                 |
+| `HOST`               | `127.0.0.1`              | Bind address                                |
+| `KAFKA_BROKERS`      | `127.0.0.1:9092`         | Comma-separated Kafka broker addresses      |
+| `KAFKA_CLIENT_ID`    | `heavy-service`          | Kafka client identifier                     |
+| `REDIS_URL`          | `redis://127.0.0.1:6379` | Redis connection URL                        |
+| `JOB_REQUESTS_TOPIC` | `job.requests`           | Kafka topic for job requests                |
+| `GROUP_ID`           | `heavy-workers`          | Kafka consumer group for the worker process |
+| `WORKER_ID`          | `worker-1`               | Identifier for the worker process instance  |
 
 ### Examples
 
@@ -53,9 +48,6 @@ npm run start:service
 
 # Run with custom Kafka brokers
 KAFKA_BROKERS=broker1:9092,broker2:9092 npm run start:service
-
-# Run with custom timeout
-REPLY_TIMEOUT_MS=30000 npm run start:service
 
 # Run a worker instance
 WORKER_ID=worker-1 npm run start:worker

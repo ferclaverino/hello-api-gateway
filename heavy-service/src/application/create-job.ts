@@ -3,7 +3,7 @@ import { Job, JobId } from "../domain/job";
 import { Queue } from "./ports/job-queue";
 import { JobRepository } from "./ports/job-repository";
 
-export class StartJob {
+export class CreateJob {
   constructor(
     private jobRequestQueue: Queue<Job>,
     private jobRepository: JobRepository,

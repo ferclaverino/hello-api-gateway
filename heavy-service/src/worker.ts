@@ -3,7 +3,7 @@ import { config } from "./infrastructure/config/config-loader";
 
 async function main() {
   console.log(
-    `Starting heavy-worker id=${config.WORKER_ID} group=${config.GROUP_ID} delay=${config.WORK_DELAY_MS}ms`,
+    `Starting heavy-worker id=${config.WORKER_ID} group=${config.GROUP_ID}`,
   );
   await startWorker();
   console.log(`heavy-worker ${config.WORKER_ID} ready`);

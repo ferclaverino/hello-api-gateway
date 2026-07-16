@@ -15,12 +15,6 @@ async function createTopicsIfMissing(): Promise<void> {
   const topics = await admin.listTopics();
   const missing: { topic: string; numPartitions: number }[] = [];
 
-  if (!topics.includes(config.WORK_TOPIC)) {
-    missing.push({ topic: config.WORK_TOPIC, numPartitions: 2 });
-  }
-  if (!topics.includes(config.REPLY_TOPIC)) {
-    missing.push({ topic: config.REPLY_TOPIC, numPartitions: 4 });
-  }
   if (!topics.includes(config.JOB_REQUESTS_TOPIC)) {
     missing.push({ topic: config.JOB_REQUESTS_TOPIC, numPartitions: 2 });
   }

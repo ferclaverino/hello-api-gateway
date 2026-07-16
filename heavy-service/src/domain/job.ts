@@ -19,7 +19,7 @@ export class Job {
   private result: Result | null = null;
 
   constructor(
-    readonly jobId: JobId,
+    readonly id: JobId,
     state?: JobState,
   ) {
     if (state) {

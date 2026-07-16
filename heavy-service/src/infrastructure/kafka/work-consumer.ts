@@ -1,56 +1,23 @@
 import { kafka } from "./kafka-client";
 import { config } from "../config/config-loader";
-import type { WorkPayload, WorkReply } from "../../domain/execute-request";
+import { Job } from "../../domain/job";
 
 const consumer = kafka.consumer({ groupId: config.GROUP_ID });
 const producer = kafka.producer({ allowAutoTopicCreation: false });
-
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 export async function startWorker(): Promise<void> {
   await producer.connect();
   await consumer.connect();
   await consumer.subscribe({
-    topic: config.WORK_TOPIC,
+    topic: config.JOB_REQUESTS_TOPIC,
     fromBeginning: false,
   });
 
   await consumer.run({
     eachMessage: async ({ message }) => {
-      const correlationId =
-        (message.headers?.correlationId as Buffer | string | undefined)?.toString() ??
-        "";
-      const payload = JSON.parse(
-        message.value?.toString() ?? "{}",
-      ) as WorkPayload;
+      const jobId = message.value?.toString();
 
-      console.log(
-        `[${config.WORKER_ID}] received job ${correlationId} task="${payload.task}"`,
-      );
-
-      const start = Date.now();
-      await sleep(config.WORK_DELAY_MS);
-      const durationMs = Date.now() - start;
-
-      const reply: WorkReply = {
-        workerId: config.WORKER_ID,
-        durationMs,
-      };
-
-      await producer.send({
-        topic: config.REPLY_TOPIC,
-        messages: [
-          {
-            key: correlationId,
-            value: JSON.stringify(reply),
-            headers: { correlationId },
-          },
-        ],
-      });
-
-      console.log(
-        `[${config.WORKER_ID}] replied to ${correlationId} in ${durationMs}ms`,
-      );
+      console.log(`[${config.WORKER_ID}] received job ${jobId}`);
     },
   });
 }
