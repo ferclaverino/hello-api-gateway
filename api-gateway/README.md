@@ -23,6 +23,7 @@ The gateway starts on `http://127.0.0.1:3000` by default.
 | Endpoint | Description |
 |----------|-------------|
 | `GET /hello` | Proxied to a backend via round-robin |
+| `POST /job` | Proxied to heavy-service |
 | `GET /health` | Returns gateway status and backend list |
 
 ## Environment Variables
@@ -34,6 +35,7 @@ The gateway starts on `http://127.0.0.1:3000` by default.
 | `BACKENDS` | — | Comma-separated backend URLs (e.g. `http://127.0.0.1:3001,http://127.0.0.1:3002`) |
 | `BACKEND_COUNT` | `2` | Auto-generate N backends on consecutive ports (used when `BACKENDS` is not set) |
 | `BACKEND_BASE_PORT` | `3001` | Starting port for auto-generated backends |
+| `ROUTES_FILE` | `routes.yaml` | Path to the YAML file defining route-to-backend mappings |
 
 ### Examples
 

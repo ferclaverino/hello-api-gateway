@@ -22,7 +22,7 @@ The server starts on `http://127.0.0.1:3001` by default.
 
 | Endpoint | Description |
 |----------|-------------|
-| `GET /hello` | Returns `{ "message": "Hello World", "instance": <port> }` |
+| `GET /hello` | Returns `{ "message": "Hello World!", "instance": <port> }` |
 
 ## Environment Variables
 

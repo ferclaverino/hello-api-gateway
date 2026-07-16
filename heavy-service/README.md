@@ -1,6 +1,6 @@
 # heavy-service
 
-HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout handling, plus a background Kafka worker process. Both processes share a single codebase (`src/service.ts` and `src/worker.ts`).
+HTTP-to-Kafka bridge with a background Kafka worker process. Both processes share a single codebase (`src/service.ts` and `src/worker.ts`).
 
 [← Back to main README](../README.md)
 
@@ -23,7 +23,7 @@ The service starts on `http://127.0.0.1:3010` by default. Multiple worker instan
 
 | Endpoint            | Description                                                            |
 | ------------------- | ---------------------------------------------------------------------- |
-| `POST /job/execute` | Dispatches work to Kafka and waits for reply with correlation ID       |
+| `POST /job/execute` | Simulates work by sleeping for `MAKE_RESULT_DELAY_MS`, then returns the result directly |
 | `POST /job`         | Starts a background job, publishes it to Kafka, and returns the job ID |
 | `GET /job/:jobId`   | Retrieves the status and result of a job by ID                         |
 
@@ -39,6 +39,7 @@ The service starts on `http://127.0.0.1:3010` by default. Multiple worker instan
 | `JOB_REQUESTS_TOPIC` | `job.requests`           | Kafka topic for job requests                |
 | `GROUP_ID`           | `heavy-workers`          | Kafka consumer group for the worker process |
 | `WORKER_ID`          | `worker-1`               | Identifier for the worker process instance  |
+| `MAKE_RESULT_DELAY_MS` | `10000`                | Simulated work duration in ms (used by `/job/execute`) |
 
 ### Examples
 
@@ -59,7 +60,7 @@ WORKER_ID=worker-1 npm run start:worker
 curl -X POST http://127.0.0.1:3010/job/execute -H "Content-Type: application/json" -d '{"task":"my-task"}'
 ```
 
-The service will dispatch the work to Kafka and wait for a worker to process it and send a reply. If no reply arrives within the timeout period (default 15s), the request will fail with HTTP 504.
+The service will simulate work by sleeping for `MAKE_RESULT_DELAY_MS` (default 10s) and return the result directly.
 
 ```bash
 # Start a background job
