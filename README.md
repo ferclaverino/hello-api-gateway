@@ -68,10 +68,10 @@ All client traffic enters through the API gateway. The gateway dispatches synchr
 
 ## Services
 
-| Service         | Description                                                                                                        | Port       |
-| --------------- | ------------------------------------------------------------------------------------------------------------------ | ---------- |
-| `api-gateway`   | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job` to heavy-service | 3000       |
-| `light-service` | Minimal microservice returning instance identity — verifies load balancing works                                   | 3001, 3002 |
+| Service         | Description                                                                                                                                        | Port       |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `api-gateway`   | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job` to heavy-service                                         | 3000       |
+| `light-service` | Minimal microservice returning instance identity — verifies load balancing works                                                                   | 3001, 3002 |
 | `heavy-service` | HTTP-to-Kafka bridge implementing request-reply with correlation IDs and timeout; also ships the background Kafka worker process (`src/worker.ts`) | 3010       |
 
 ## Key Patterns & Design Decisions
@@ -85,7 +85,7 @@ domain ← application ← adapters ← infrastructure
 ```
 
 - **domain** — core business concepts and rules (pure functions, no framework dependencies)
-- **application** — use-case orchestration via the `RequestReply` class (timeout racing, ports injected at the composition root)
+- **application** — use-case orchestration
 - **adapters** — protocol-specific concerns (Zod schemas, request/response mappers)
 - **infrastructure** — framework integration (Fastify, KafkaJS, config, logging)
 
@@ -231,7 +231,7 @@ curl http://127.0.0.1:3000/health
 │       ├── service.ts             # HTTP service entry point
 │       ├── worker.ts              # Background worker entry point
 │       ├── domain/               # WorkPayload, WorkReply, Job interfaces
-│       ├── application/          # RequestReply, StartJob, GetJob use cases
+│       ├── application/          # CreateJob, GetJob, ExecuteJob use cases
 │       ├── adapters/             # Execute/Job endpoint schemas + mappers
 │       └── infrastructure/       # Fastify server, Kafka client/producer/consumer, Redis, config
 │
