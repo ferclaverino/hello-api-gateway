@@ -21,25 +21,25 @@ The service starts on `http://127.0.0.1:3010` by default. Multiple worker instan
 
 ## Endpoints
 
-| Endpoint            | Description                                                            |
-| ------------------- | ---------------------------------------------------------------------- |
+| Endpoint            | Description                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------- |
 | `POST /job/execute` | Simulates work by sleeping for `MAKE_RESULT_DELAY_MS`, then returns the result directly |
-| `POST /job`         | Starts a background job, publishes it to Kafka, and returns the job ID |
-| `GET /job/:jobId`   | Retrieves the status and result of a job by ID                         |
+| `POST /job`         | Starts a background job, publishes it to Kafka, and returns the job ID                  |
+| `GET /job/:jobId`   | Retrieves the status and result of a job by ID                                          |
 
 ## Environment Variables
 
-| Variable             | Default                  | Description                                 |
-| -------------------- | ------------------------ | ------------------------------------------- |
-| `PORT`               | `3010`                   | Server port                                 |
-| `HOST`               | `127.0.0.1`              | Bind address                                |
-| `KAFKA_BROKERS`      | `127.0.0.1:9092`         | Comma-separated Kafka broker addresses      |
-| `KAFKA_CLIENT_ID`    | `heavy-service`          | Kafka client identifier                     |
-| `REDIS_URL`          | `redis://127.0.0.1:6379` | Redis connection URL                        |
-| `JOB_REQUESTS_TOPIC` | `job.requests`           | Kafka topic for job requests                |
-| `GROUP_ID`           | `heavy-workers`          | Kafka consumer group for the worker process |
-| `WORKER_ID`          | `worker-1`               | Identifier for the worker process instance  |
-| `MAKE_RESULT_DELAY_MS` | `10000`                | Simulated work duration in ms (used by `/job/execute`) |
+| Variable               | Default                  | Description                                            |
+| ---------------------- | ------------------------ | ------------------------------------------------------ |
+| `PORT`                 | `3010`                   | Server port                                            |
+| `HOST`                 | `127.0.0.1`              | Bind address                                           |
+| `KAFKA_BROKERS`        | `127.0.0.1:9092`         | Comma-separated Kafka broker addresses                 |
+| `KAFKA_CLIENT_ID`      | `heavy-service`          | Kafka client identifier                                |
+| `REDIS_URL`            | `redis://127.0.0.1:6379` | Redis connection URL                                   |
+| `JOB_REQUESTS_TOPIC`   | `job.requests`           | Kafka topic for job requests                           |
+| `GROUP_ID`             | `heavy-workers`          | Kafka consumer group for the worker process            |
+| `WORKER_ID`            | `worker-1`               | Identifier for the worker process instance             |
+| `MAKE_RESULT_DELAY_MS` | `10000`                  | Simulated work duration in ms (used by `/job/execute`) |
 
 ### Examples
 
@@ -57,7 +57,7 @@ WORKER_ID=worker-1 npm run start:worker
 ## Test
 
 ```bash
-curl -X POST http://127.0.0.1:3010/job/execute -H "Content-Type: application/json" -d '{"task":"my-task"}'
+curl -X POST http://127.0.0.1:3010/job/execute
 ```
 
 The service will simulate work by sleeping for `MAKE_RESULT_DELAY_MS` (default 10s) and return the result directly.
