@@ -68,10 +68,10 @@ All client traffic enters through the API gateway. The gateway dispatches synchr
 
 ## Services
 
-| Service         | Description                                                                                                                                        | Port       |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| `api-gateway`   | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job` to heavy-service                                         | 3000       |
-| `light-service` | Minimal microservice returning instance identity — verifies load balancing works                                                                   | 3001, 3002 |
+| Service         | Description                                                                                                         | Port       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- | ---------- |
+| `api-gateway`   | Reverse proxy with YAML-configurable routing. Routes `/hello` to light-service and `/job` to heavy-service          | 3000       |
+| `light-service` | Minimal microservice returning instance identity — verifies load balancing works                                    | 3001, 3002 |
 | `heavy-service` | HTTP-to-Kafka bridge that publishes jobs to Kafka; also ships the background Kafka worker process (`src/worker.ts`) | 3010       |
 
 ## Key Patterns & Design Decisions
@@ -235,12 +235,4 @@ curl http://127.0.0.1:3000/health
 │       └── infrastructure/       # Fastify server, Kafka client/producer/consumer, Redis, config
 │
 └── docker-compose.yml            # Full stack orchestration (8 containers)
-```
-
-## AI Skills
-
-This project uses [autoskills](https://github.com/midudev/autoskills) to automatically install AI agent skills based on the detected tech stack.
-
-```bash
-npx autoskills
 ```
