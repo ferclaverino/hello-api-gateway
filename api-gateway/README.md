@@ -7,13 +7,13 @@ A round-robin load balancing proxy built with Fastify.
 ## Setup
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## Run
 
 ```bash
-npm start
+pnpm start
 ```
 
 The gateway starts on `http://127.0.0.1:3000` by default.
@@ -41,13 +41,13 @@ The gateway starts on `http://127.0.0.1:3000` by default.
 
 ```bash
 # Use defaults (2 backends on ports 3001, 3002)
-npm start
+pnpm start
 
 # Specify backends explicitly
-BACKENDS=http://127.0.0.1:3001,http://127.0.0.1:3002,http://127.0.0.1:3003 npm start
+BACKENDS=http://127.0.0.1:3001,http://127.0.0.1:3002,http://127.0.0.1:3003 pnpm start
 
 # Auto-generate 4 backends starting at port 4000
-BACKEND_COUNT=4 BACKEND_BASE_PORT=4000 npm start
+BACKEND_COUNT=4 BACKEND_BASE_PORT=4000 pnpm start
 ```
 
 ## Test

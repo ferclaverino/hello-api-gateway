@@ -58,8 +58,8 @@ curl http://127.0.0.1:3000/health
 ## Build
 
 ```bash
-npm run build    # Compiles TypeScript to dist/
-npm run dev      # Runs with tsx (no build needed)
+pnpm build    # Compiles TypeScript to dist/
+pnpm dev      # Runs with tsx (no build needed)
 ```
 
-`heavy-service` has two entry points: `npm run dev:service` and `npm run dev:worker`.
+`heavy-service` has two entry points: `pnpm run dev:service` and `pnpm run dev:worker`.

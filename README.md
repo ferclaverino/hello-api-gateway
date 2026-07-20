@@ -6,7 +6,7 @@
 ![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)
 ![Zod](https://img.shields.io/badge/Zod-4.4-3068B7?logo=zod)
-![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js)
+![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=node.js)
 ![KRaft](https://img.shields.io/badge/Kafka-KRaft-231F20)
 
 A microservices reference architecture demonstrating API gateway routing, round-robin load balancing, and asynchronous job processing over Apache Kafka — built with Fastify, TypeScript, and clean architecture principles.
@@ -130,7 +130,7 @@ The Kafka broker runs in KRaft mode (Kafka Raft metadata mode), eliminating the 
 | Category              | Technology       | Purpose                                                     |
 | --------------------- | ---------------- | ----------------------------------------------------------- |
 | **Language**          | TypeScript 5.8   | Type-safe development with strict mode                      |
-| **Runtime**           | Node.js 22       | ES2022 target, native fetch()                               |
+| **Runtime**           | Node.js 24       | ES2022 target, native fetch()                               |
 | **HTTP Framework**    | Fastify 5.3      | High-performance HTTP server with hook-based middleware     |
 | **Schema Validation** | Zod 4.4          | Runtime type validation for config, requests, and responses |
 | **Message Broker**    | Apache Kafka 7.6 | Asynchronous messaging with KRaft mode (no Zookeeper)       |
@@ -144,7 +144,7 @@ The Kafka broker runs in KRaft mode (Kafka Raft metadata mode), eliminating the 
 ### Prerequisites
 
 - Docker and Docker Compose
-- Node.js 22+ (for local development)
+- Node.js 24+ (for local development)
 
 ### Quick Start
 
@@ -158,28 +158,28 @@ This starts all 8 containers: 1 Kafka broker, 1 Redis, 2 light-service instances
 
 ```bash
 # Terminal 1 — light-service instances
-cd light-service && npm install && npm start        # port 3001
-PORT=3002 npm start                                 # port 3002
+cd light-service && pnpm install && pnpm start        # port 3001
+PORT=3002 pnpm start                                 # port 3002
 
 # Terminal 2 — api-gateway
-cd api-gateway && npm install && npm start          # port 3000
+cd api-gateway && pnpm install && pnpm start          # port 3000
 
 # Terminal 3 — Kafka broker + Redis (Docker)
 docker compose up kafka redis
 
 # Terminal 4 — heavy-service (accessed via gateway)
-cd heavy-service && npm install && npm run start:service  # port 3010
+cd heavy-service && pnpm install && pnpm run start:service  # port 3010
 
 # Terminal 5 — heavy-workers (same codebase, different process)
-cd heavy-service && npm run start:worker                  # worker-1
-WORKER_ID=worker-2 npm run start:worker                   # worker-2
+cd heavy-service && pnpm run start:worker                  # worker-1
+WORKER_ID=worker-2 pnpm run start:worker                   # worker-2
 ```
 
 ### Build
 
 ```bash
-npm run build    # Compiles TypeScript to dist/
-npm run dev      # Runs with tsx (no build needed)
+pnpm build    # Compiles TypeScript to dist/
+pnpm dev      # Runs with tsx (no build needed)
 ```
 
 ## Testing

@@ -7,14 +7,14 @@ HTTP-to-Kafka bridge with a background Kafka worker process. Both processes shar
 ## Setup
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## Run
 
 ```bash
-npm run start:service   # HTTP bridge (default port 3010)
-npm run start:worker    # background Kafka worker
+pnpm run start:service   # HTTP bridge (default port 3010)
+pnpm run start:worker    # background Kafka worker
 ```
 
 The service starts on `http://127.0.0.1:3010` by default. Multiple worker instances can run concurrently with distinct `WORKER_ID` values.
@@ -45,13 +45,13 @@ The service starts on `http://127.0.0.1:3010` by default. Multiple worker instan
 
 ```bash
 # Run with default configuration
-npm run start:service
+pnpm run start:service
 
 # Run with custom Kafka brokers
-KAFKA_BROKERS=broker1:9092,broker2:9092 npm run start:service
+KAFKA_BROKERS=broker1:9092,broker2:9092 pnpm run start:service
 
 # Run a worker instance
-WORKER_ID=worker-1 npm run start:worker
+WORKER_ID=worker-1 pnpm run start:worker
 ```
 
 ## Test

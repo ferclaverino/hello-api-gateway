@@ -10,6 +10,7 @@ services:
       HOST: "0.0.0.0"
     volumes:
       - ./light-service:/app
+      - /app/node_modules
     restart: unless-stopped
 
   light-service-2:
@@ -23,6 +24,7 @@ services:
       HOST: "0.0.0.0"
     volumes:
       - ./light-service:/app
+      - /app/node_modules
     restart: unless-stopped
 
   api-gateway:
@@ -35,6 +37,7 @@ services:
       - .env
     volumes:
       - ./api-gateway:/app
+      - /app/node_modules
     restart: unless-stopped
     depends_on:
       - light-service-1
@@ -89,7 +92,7 @@ services:
     build:
       context: ./heavy-service
       dockerfile: Dockerfile.dev
-    command: npm run dev:service
+    command: pnpm run dev:service
     ports:
       - "3010:3010"
     environment:
@@ -101,6 +104,7 @@ services:
       JOB_REQUESTS_TOPIC: "job.requests"
     volumes:
       - ./heavy-service:/app
+      - /app/node_modules
     restart: unless-stopped
     depends_on:
       kafka:
@@ -112,7 +116,7 @@ services:
     build:
       context: ./heavy-service
       dockerfile: Dockerfile.dev
-    command: npm run dev:worker
+    command: pnpm run dev:worker
     environment:
       KAFKA_BROKERS: "kafka:9092"
       KAFKA_CLIENT_ID: "heavy-worker-1"
@@ -120,6 +124,7 @@ services:
       WORKER_ID: "worker-1"
     volumes:
       - ./heavy-service:/app
+      - /app/node_modules
     restart: unless-stopped
     depends_on:
       kafka:
@@ -131,7 +136,7 @@ services:
     build:
       context: ./heavy-service
       dockerfile: Dockerfile.dev
-    command: npm run dev:worker
+    command: pnpm run dev:worker
     environment:
       KAFKA_BROKERS: "kafka:9092"
       KAFKA_CLIENT_ID: "heavy-worker-2"
@@ -139,6 +144,7 @@ services:
       WORKER_ID: "worker-2"
     volumes:
       - ./heavy-service:/app
+      - /app/node_modules
     restart: unless-stopped
     depends_on:
       kafka:
