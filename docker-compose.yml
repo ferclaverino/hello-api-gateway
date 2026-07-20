@@ -127,6 +127,8 @@ services:
       - /app/node_modules
     restart: unless-stopped
     depends_on:
+      heavy-service:
+        condition: service_started
       kafka:
         condition: service_healthy
       redis:
@@ -147,6 +149,8 @@ services:
       - /app/node_modules
     restart: unless-stopped
     depends_on:
+      heavy-service:
+        condition: service_started
       kafka:
         condition: service_healthy
       redis:
