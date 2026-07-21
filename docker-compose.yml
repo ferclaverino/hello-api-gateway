@@ -112,46 +112,46 @@ services:
       redis:
         condition: service_healthy
 
-  heavy-worker-1:
-    build:
-      context: ./heavy-service
-      dockerfile: Dockerfile.dev
-    command: pnpm run dev:worker
-    environment:
-      KAFKA_BROKERS: "kafka:9092"
-      KAFKA_CLIENT_ID: "heavy-worker-1"
-      GROUP_ID: "heavy-workers"
-      WORKER_ID: "worker-1"
-    volumes:
-      - ./heavy-service:/app
-      - /app/node_modules
-    restart: unless-stopped
-    depends_on:
-      heavy-service:
-        condition: service_started
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+  # heavy-worker-1:
+  #   build:
+  #     context: ./heavy-service
+  #     dockerfile: Dockerfile.dev
+  #   command: pnpm run dev:worker
+  #   environment:
+  #     KAFKA_BROKERS: "kafka:9092"
+  #     KAFKA_CLIENT_ID: "heavy-worker-1"
+  #     GROUP_ID: "heavy-workers"
+  #     WORKER_ID: "worker-1"
+  #   volumes:
+  #     - ./heavy-service:/app
+  #     - /app/node_modules
+  #   restart: unless-stopped
+  #   depends_on:
+  #     heavy-service:
+  #       condition: service_started
+  #     kafka:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
 
-  heavy-worker-2:
-    build:
-      context: ./heavy-service
-      dockerfile: Dockerfile.dev
-    command: pnpm run dev:worker
-    environment:
-      KAFKA_BROKERS: "kafka:9092"
-      KAFKA_CLIENT_ID: "heavy-worker-2"
-      GROUP_ID: "heavy-workers"
-      WORKER_ID: "worker-2"
-    volumes:
-      - ./heavy-service:/app
-      - /app/node_modules
-    restart: unless-stopped
-    depends_on:
-      heavy-service:
-        condition: service_started
-      kafka:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+  # heavy-worker-2:
+  #   build:
+  #     context: ./heavy-service
+  #     dockerfile: Dockerfile.dev
+  #   command: pnpm run dev:worker
+  #   environment:
+  #     KAFKA_BROKERS: "kafka:9092"
+  #     KAFKA_CLIENT_ID: "heavy-worker-2"
+  #     GROUP_ID: "heavy-workers"
+  #     WORKER_ID: "worker-2"
+  #   volumes:
+  #     - ./heavy-service:/app
+  #     - /app/node_modules
+  #   restart: unless-stopped
+  #   depends_on:
+  #     heavy-service:
+  #       condition: service_started
+  #     kafka:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
