@@ -6,7 +6,7 @@ interface EventMapper<E extends DomainEvent> {
   toMessage(event: E): string;
 }
 
-const mappers: Record<string, EventMapper<DomainEvent>> = {
+export const mappers: Record<string, EventMapper<DomainEvent>> = {
   [JobCreatedEvent.name]: {
     topic: "job.created",
     toMessage: (event: JobCreatedEvent) =>
@@ -14,7 +14,7 @@ const mappers: Record<string, EventMapper<DomainEvent>> = {
   },
 };
 
-export function toProducerRecord(domainEvent: DomainEvent): ProducerRecord {
+export function toMessage(domainEvent: DomainEvent): ProducerRecord {
   const mapper: EventMapper<DomainEvent> | undefined =
     mappers[domainEvent.constructor.name];
   if (!mapper) {
@@ -24,4 +24,12 @@ export function toProducerRecord(domainEvent: DomainEvent): ProducerRecord {
     topic: mapper.topic,
     messages: [{ value: mapper.toMessage(domainEvent) }],
   };
+}
+
+export function getTopicName(eventName: string): string {
+  const mapper: EventMapper<DomainEvent> | undefined = mappers[eventName];
+  if (!mapper) {
+    throw new Error(`Unhandled event type: ${eventName}`);
+  }
+  return mapper.topic;
 }

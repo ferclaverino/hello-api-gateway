@@ -17,15 +17,18 @@ export class KafkaClient {
   private producerConnected = false;
   private consumerConnected = false;
 
-  constructor(allowAutoTopicCreation = false) {
+  constructor() {
     this.kafka = new Kafka({
       clientId: config.KAFKA_CLIENT_ID,
       brokers: kafkaBrokers,
       logLevel: logLevel.WARN,
     });
     this.admin = this.kafka.admin();
-    this.producer = this.kafka.producer({ allowAutoTopicCreation });
-    this.consumer = this.kafka.consumer({ groupId: config.GROUP_ID });
+    this.producer = this.kafka.producer({ allowAutoTopicCreation: true });
+    this.consumer = this.kafka.consumer({
+      groupId: config.GROUP_ID,
+      allowAutoTopicCreation: true,
+    });
   }
 
   async connectAdmin(): Promise<void> {

@@ -11,12 +11,14 @@ import { RedisJobRepository } from "../redis/redis-job-repository";
 import { connectRedis, disconnectRedis } from "../redis/redis-client";
 import { MakeResult } from "../../application/make-result";
 import { KafkaEventBus } from "../kafka/kafka-event-bus";
+import { getTopicName } from "../../adapters/kafka/event.mapper";
+import { JobCreatedEvent } from "../../domain/events";
 
 const { PORT, HOST } = config;
 
 const app = createServer();
 
-const kafkaClient = new KafkaClient(true);
+const kafkaClient = new KafkaClient();
 
 const makeResult = new MakeResult(config.MAKE_RESULT_DELAY_MS);
 
@@ -28,6 +30,24 @@ const getJob = new GetJob(jobRepository);
 async function main() {
   await kafkaClient.connectAdmin();
   app.log.info("Kafka admin connected");
+
+  const topic = getTopicName(JobCreatedEvent.name);
+  const created = await kafkaClient.admin.createTopics({
+    topics: [
+      {
+        topic,
+        numPartitions: config.KAFKA_JOB_TOPIC_PARTITIONS,
+        replicationFactor: config.KAFKA_JOB_TOPIC_REPLICATION_FACTOR,
+      },
+    ],
+    waitForLeaders: config.KAFKA_JOB_TOPIC_WAIT_FOR_LEADERS,
+  });
+  app.log.info(
+    created
+      ? `Kafka topic ${topic} created (${config.KAFKA_JOB_TOPIC_PARTITIONS} partitions)`
+      : `Kafka topic ${topic} already exists`,
+  );
+
   await kafkaClient.connectProducer();
   app.log.info("Kafka producer connected");
 
