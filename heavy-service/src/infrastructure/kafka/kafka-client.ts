@@ -6,51 +6,83 @@ import {
   type Consumer,
 } from "kafkajs";
 import { kafkaBrokers, config } from "../config/config-loader";
+import { getTopicName } from "../../adapters/kafka/event.mapper";
+import { JobCreatedEvent } from "../../domain/events";
 
-export class KafkaClient {
+export function createKafka(): Kafka {
+  return new Kafka({
+    clientId: config.KAFKA_CLIENT_ID,
+    brokers: kafkaBrokers,
+    logLevel: logLevel.WARN,
+  });
+}
+
+export class KafkaClientForService {
   readonly admin: Admin;
   readonly producer: Producer;
-  readonly consumer: Consumer;
 
   private readonly kafka: Kafka;
-  private adminConnected = false;
-  private producerConnected = false;
-  private consumerConnected = false;
 
   constructor() {
-    this.kafka = new Kafka({
-      clientId: config.KAFKA_CLIENT_ID,
-      brokers: kafkaBrokers,
-      logLevel: logLevel.WARN,
-    });
+    this.kafka = createKafka();
     this.admin = this.kafka.admin();
-    this.producer = this.kafka.producer({ allowAutoTopicCreation: true });
-    this.consumer = this.kafka.consumer({
-      groupId: config.GROUP_ID,
-      allowAutoTopicCreation: true,
-    });
+    this.producer = this.kafka.producer({ allowAutoTopicCreation: false });
   }
 
-  async connectAdmin(): Promise<void> {
+  async connect(): Promise<void> {
     await this.admin.connect();
-    this.adminConnected = true;
-  }
-
-  async connectProducer(): Promise<void> {
     await this.producer.connect();
-    this.producerConnected = true;
-  }
 
-  async connectConsumer(): Promise<void> {
-    await this.consumer.connect();
-    this.consumerConnected = true;
+    await this.createTopicsIfMissing();
   }
 
   async disconnect(): Promise<void> {
-    if (this.producerConnected)
-      await this.producer.disconnect().catch(() => {});
-    if (this.consumerConnected)
-      await this.consumer.disconnect().catch(() => {});
-    if (this.adminConnected) await this.admin.disconnect().catch(() => {});
+    await this.admin.disconnect().catch(() => {});
+    await this.producer.disconnect().catch(() => {});
+  }
+
+  private async createTopicsIfMissing(): Promise<void> {
+    const topics = await this.admin.listTopics();
+    const missing: { topic: string; numPartitions: number }[] = [];
+
+    const jobCreatedTopic = getTopicName(JobCreatedEvent.name);
+    if (!topics.includes(jobCreatedTopic)) {
+      missing.push({
+        topic: jobCreatedTopic,
+        numPartitions: config.KAFKA_TOPIC_PARTITIONS,
+      });
+    }
+
+    if (missing.length > 0) {
+      await this.admin.createTopics({
+        topics: missing.map((t) => ({
+          topic: t.topic,
+          numPartitions: t.numPartitions,
+          replicationFactor: 1,
+        })),
+      });
+    }
+  }
+}
+
+export class KafkaClientForWorker {
+  readonly consumer: Consumer;
+
+  private readonly kafka: Kafka;
+
+  constructor() {
+    this.kafka = createKafka();
+    this.consumer = this.kafka.consumer({
+      groupId: config.GROUP_ID,
+      allowAutoTopicCreation: false,
+    });
+  }
+
+  async connect(): Promise<void> {
+    await this.consumer.connect();
+  }
+
+  async disconnect(): Promise<void> {
+    await this.consumer.disconnect().catch(() => {});
   }
 }
