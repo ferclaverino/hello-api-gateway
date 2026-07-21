@@ -3,6 +3,7 @@ import { config } from "./infrastructure/config/config-loader";
 import { registerMakeResultRoute as registerMakeResultRoute } from "./infrastructure/fastify/register-make-result-route";
 import { registerCreateJobRoute } from "./infrastructure/fastify/register-create-job-route";
 import { registerGetJobRoute } from "./infrastructure/fastify/register-get-job-route";
+import { registerStatusRoute } from "./infrastructure/fastify/register-status-route";
 import {
   connectKafka,
   disconnectKafka,
@@ -38,6 +39,7 @@ async function main() {
   registerMakeResultRoute(app, makeResult);
   registerCreateJobRoute(app, createJob);
   registerGetJobRoute(app, getJob);
+  registerStatusRoute(app);
 
   await app.listen({ port: PORT, host: HOST });
   app.log.info(`Heavy service listening on port ${PORT}`);
