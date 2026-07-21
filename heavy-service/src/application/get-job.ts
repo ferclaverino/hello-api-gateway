@@ -1,5 +1,5 @@
 import { Job, JobId } from "../domain/job";
-import { JobRepository } from "./ports/job-repository";
+import { JobRepository } from "../domain/ports/job-repository";
 
 export class GetJob {
   constructor(private jobRepository: JobRepository) {}

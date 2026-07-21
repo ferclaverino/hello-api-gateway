@@ -1,6 +1,6 @@
 import { redis } from "./redis-client";
 import { Job } from "../../domain/job";
-import type { JobRepository } from "../../application/ports/job-repository";
+import type { JobRepository } from "../../domain/ports/job-repository";
 import type { JobId } from "../../domain/job";
 import { toJob, toJobKey, toRedisItem } from "../../adapters/redis/job.mapper";
 

@@ -1,7 +1,7 @@
 import { Job, JobId } from "../domain/job";
 import { MakeResult } from "./make-result";
-import { Queue } from "./ports/job-queue";
-import { JobRepository } from "./ports/job-repository";
+import { Queue } from "../domain/ports/job-queue";
+import { JobRepository } from "../domain/ports/job-repository";
 
 export class ExecuteJob {
   constructor(

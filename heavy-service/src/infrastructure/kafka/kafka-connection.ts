@@ -3,11 +3,12 @@ import { config } from "../config/config-loader";
 
 export const admin = kafka.admin();
 
-const producer = kafka.producer({ allowAutoTopicCreation: false });
+const producer = kafka.producer({ allowAutoTopicCreation: true });
 
+// TODO singleton
 export async function connectKafka(): Promise<void> {
   await admin.connect();
-  await createTopicsIfMissing();
+  // await createTopicsIfMissing();
   await producer.connect();
 }
 

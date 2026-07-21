@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { ZodTypeProvider } from "@fastify/type-provider-zod";
 import { getJobSchema } from "./schemas/get-job.schema";
 import { GetJob } from "../../application/get-job";
-import { toGetJobResponse } from "../../adapters/fastify/get-job.adapter";
+import { toGetJobResponse } from "../../adapters/fastify/get-job.mapper";
 
 export function registerGetJobRoute(
   app: FastifyInstance,

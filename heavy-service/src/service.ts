@@ -9,13 +9,13 @@ import {
 } from "./infrastructure/kafka/kafka-connection";
 import { CreateJob } from "./application/create-job";
 import { GetJob } from "./application/get-job";
-import { KafkaJobQueue } from "./infrastructure/kafka/kafka-job-queue";
 import { RedisJobRepository } from "./infrastructure/redis/redis-job-repository";
 import {
   connectRedis,
   disconnectRedis,
 } from "./infrastructure/redis/redis-client";
 import { MakeResult } from "./application/make-result";
+import { KafkaEventBus } from "./infrastructure/kafka/kafka-event-bus";
 
 const { PORT, HOST } = config;
 
@@ -23,9 +23,9 @@ const app = createServer();
 
 const makeResult = new MakeResult(config.MAKE_RESULT_DELAY_MS);
 
-const jobQueue = new KafkaJobQueue();
 const jobRepository = new RedisJobRepository();
-const createJob = new CreateJob(jobQueue, jobRepository);
+const kafkaEventBus = new KafkaEventBus();
+const createJob = new CreateJob(jobRepository, kafkaEventBus);
 const getJob = new GetJob(jobRepository);
 
 async function main() {
