@@ -1,4 +1,4 @@
-import { Job, JobId } from "../../domain/job";
+import { Job, JobId } from "../job";
 
 export interface JobRepository {
   save(job: Job): void;
