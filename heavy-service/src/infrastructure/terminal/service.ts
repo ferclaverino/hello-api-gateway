@@ -1,22 +1,16 @@
-import { createServer } from "./infrastructure/fastify/create-server";
-import { config } from "./infrastructure/config/config-loader";
-import { registerMakeResultRoute as registerMakeResultRoute } from "./infrastructure/fastify/register-make-result-route";
-import { registerCreateJobRoute } from "./infrastructure/fastify/register-create-job-route";
-import { registerGetJobRoute } from "./infrastructure/fastify/register-get-job-route";
-import { registerStatusRoute } from "./infrastructure/fastify/register-status-route";
-import {
-  connectKafka,
-  disconnectKafka,
-} from "./infrastructure/kafka/kafka-connection";
-import { CreateJob } from "./application/create-job";
-import { GetJob } from "./application/get-job";
-import { RedisJobRepository } from "./infrastructure/redis/redis-job-repository";
-import {
-  connectRedis,
-  disconnectRedis,
-} from "./infrastructure/redis/redis-client";
-import { MakeResult } from "./application/make-result";
-import { KafkaEventBus } from "./infrastructure/kafka/kafka-event-bus";
+import { createServer } from "../fastify/create-server";
+import { config } from "../config/config-loader";
+import { registerMakeResultRoute as registerMakeResultRoute } from "../fastify/register-make-result-route";
+import { registerCreateJobRoute } from "../fastify/register-create-job-route";
+import { registerGetJobRoute } from "../fastify/register-get-job-route";
+import { registerStatusRoute } from "../fastify/register-status-route";
+import { connectKafka, disconnectKafka } from "../kafka/kafka-connection";
+import { CreateJob } from "../../application/create-job";
+import { GetJob } from "../../application/get-job";
+import { RedisJobRepository } from "../redis/redis-job-repository";
+import { connectRedis, disconnectRedis } from "../redis/redis-client";
+import { MakeResult } from "../../application/make-result";
+import { KafkaEventBus } from "../kafka/kafka-event-bus";
 
 const { PORT, HOST } = config;
 

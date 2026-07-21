@@ -2,11 +2,11 @@
   "name": "heavy-service",
   "version": "1.0.0",
   "scripts": {
-    "dev:service": "tsx --watch src/service.ts",
-    "dev:worker": "tsx --watch src/worker.ts",
+    "dev:service": "tsx --watch src/infrastructure/terminal/service.ts",
+    "dev:worker": "tsx --watch src/infrastructure/terminal/worker.ts",
     "build": "tsc",
-    "start:service": "tsx src/service.ts",
-    "start:worker": "tsx src/worker.ts"
+    "start:service": "tsx src/infrastructure/terminal/service.ts",
+    "start:worker": "tsx src/infrastructure/terminal/worker.ts"
   },
   "dependencies": {
     "@fastify/type-provider-zod": "^1.0.0",

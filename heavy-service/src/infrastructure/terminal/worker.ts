@@ -1,5 +1,5 @@
-import { startWorker, stopWorker } from "./infrastructure/kafka/work-consumer";
-import { config } from "./infrastructure/config/config-loader";
+import { startWorker, stopWorker } from "../kafka/work-consumer";
+import { config } from "../config/config-loader";
 
 async function main() {
   console.log(
