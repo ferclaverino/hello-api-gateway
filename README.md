@@ -46,8 +46,8 @@ The entire stack runs via Docker Compose (8 containers) and is fully observable 
                                                                │   Kafka Broker     │
                                                                │   (KRaft mode)     │
                                                                │                    │
-                                                               │  job.requests      │
-                                                               │  topic             │
+                                                                │  job.created       │
+                                                                │  topic             │
                                                                └──┬─────────────┬──┘
                                                                  │             │
                                                     ┌────────────┘             └────────────┐
@@ -106,7 +106,7 @@ Route configuration is loaded from `routes.yaml` at startup, supporting YAML-dri
 The heavy service publishes jobs to Kafka for background processing:
 
 1. Client sends `POST /job` to the API gateway
-2. Gateway forwards to heavy-service, which creates a job in Redis and publishes the job ID to the `job.requests` Kafka topic
+2. Gateway forwards to heavy-service, which creates a job in Redis and publishes the job ID to the `job.created` Kafka topic
 3. The HTTP response returns the job ID immediately
 4. Worker instances (consumer group `heavy-workers`) receive the job ID from Kafka
 5. Client can poll `GET /job/:jobId` to check job status and result
