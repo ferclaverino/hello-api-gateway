@@ -1,17 +1,21 @@
-import { startWorker, stopWorker } from "../kafka/work-consumer";
+import { startWorker } from "../kafka/work-consumer";
+import { KafkaClient } from "../kafka/kafka-client";
 import { config } from "../config/config-loader";
+
+const kafkaClient = new KafkaClient();
 
 async function main() {
   console.log(
     `Starting heavy-worker id=${config.WORKER_ID} group=${config.GROUP_ID}`,
   );
-  await startWorker();
+  await kafkaClient.connectConsumer();
+  await startWorker(kafkaClient.consumer);
   console.log(`heavy-worker ${config.WORKER_ID} ready`);
 }
 
 async function shutdown(signal: string) {
   console.log(`${signal} received, shutting down worker ${config.WORKER_ID}`);
-  await stopWorker();
+  await kafkaClient.disconnect();
   process.exit(0);
 }
 

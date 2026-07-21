@@ -1,5 +1,5 @@
-import { admin } from "./kafka-connection";
 import type { PartitionMetadata } from "kafkajs";
+import type { KafkaClient } from "./kafka-client";
 
 export interface TopicPartitionStats {
   partition: number;
@@ -17,7 +17,8 @@ export interface TopicStats {
   partitions: TopicPartitionStats[];
 }
 
-export async function getTopicStats(): Promise<TopicStats[]> {
+export async function getTopicStats(kafkaClient: KafkaClient): Promise<TopicStats[]> {
+  const { admin } = kafkaClient;
   const topics = await admin.listTopics();
   if (topics.length === 0) return [];
 
