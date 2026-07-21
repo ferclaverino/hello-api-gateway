@@ -23,5 +23,8 @@ export function toTopicName(domainEvent: DomainEvent): string {
 }
 
 export function toMessage(domainEvent: DomainEvent): string {
-  return JSON.stringify(domainEvent);
+  if (domainEvent instanceof JobCreatedEvent) {
+    return JSON.stringify({ jobId: domainEvent.jobId });
+  }
+  throw new Error(`Unhandled event type: ${domainEvent.constructor.name}`);
 }

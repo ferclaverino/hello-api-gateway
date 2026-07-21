@@ -3,7 +3,7 @@ import { config } from "../config/config-loader";
 
 export async function startWorker(consumer: Consumer): Promise<void> {
   await consumer.subscribe({
-    topic: config.JOB_REQUESTS_TOPIC,
+    topic: "job.created",
     fromBeginning: false,
   });
 
