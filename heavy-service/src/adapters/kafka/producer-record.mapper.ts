@@ -1,30 +1,27 @@
 import { ProducerRecord } from "kafkajs";
 import { DomainEvent, JobCreatedEvent } from "../../domain/events";
 
+interface EventMapper<E extends DomainEvent> {
+  topic: string;
+  toMessage(event: E): string;
+}
+
+const mappers: Record<string, EventMapper<DomainEvent>> = {
+  [JobCreatedEvent.name]: {
+    topic: "job.created",
+    toMessage: (event: JobCreatedEvent) =>
+      JSON.stringify({ jobId: event.jobId }),
+  },
+};
+
 export function toProducerRecord(domainEvent: DomainEvent): ProducerRecord {
-  const topic = toTopicName(domainEvent);
-  const messageValue = JSON.stringify(domainEvent);
-
+  const mapper: EventMapper<DomainEvent> | undefined =
+    mappers[domainEvent.constructor.name];
+  if (!mapper) {
+    throw new Error(`Unhandled event type: ${domainEvent.constructor.name}`);
+  }
   return {
-    topic,
-    messages: [
-      {
-        value: messageValue,
-      },
-    ],
+    topic: mapper.topic,
+    messages: [{ value: mapper.toMessage(domainEvent) }],
   };
-}
-
-export function toTopicName(domainEvent: DomainEvent): string {
-  if (domainEvent instanceof JobCreatedEvent) {
-    return "job.created";
-  }
-  throw new Error(`Unhandled event type: ${domainEvent.constructor.name}`);
-}
-
-export function toMessage(domainEvent: DomainEvent): string {
-  if (domainEvent instanceof JobCreatedEvent) {
-    return JSON.stringify({ jobId: domainEvent.jobId });
-  }
-  throw new Error(`Unhandled event type: ${domainEvent.constructor.name}`);
 }
