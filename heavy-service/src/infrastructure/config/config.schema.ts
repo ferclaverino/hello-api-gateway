@@ -10,6 +10,8 @@ export const EnvConfigSchema = z.object({
   WORKER_ID: z.string().default("worker-1"),
   MAKE_RESULT_DELAY_MS: z.coerce.number().int().positive().default(10000),
   KAFKA_TOPIC_PARTITIONS: z.coerce.number().int().positive().default(4),
+  KAFKA_TOPIC_WAIT_INTERVAL_MS: z.coerce.number().int().positive().default(2000),
+  KAFKA_TOPIC_WAIT_TIMEOUT_MS: z.coerce.number().int().positive().default(60000),
 });
 
 export type Config = z.infer<typeof EnvConfigSchema>;
