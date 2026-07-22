@@ -1,4 +1,7 @@
-import type { Admin, PartitionMetadata } from "kafkajs";
+import type { KafkaJS } from "@confluentinc/kafka-javascript";
+
+type Admin = KafkaJS.Admin;
+type PartitionMetadata = KafkaJS.PartitionMetadata;
 
 export interface TopicPartitionStats {
   partition: number;
@@ -20,7 +23,7 @@ export async function getTopicStats(admin: Admin): Promise<TopicStats[]> {
   const topics = await admin.listTopics();
   if (topics.length === 0) return [];
 
-  const { topics: metadata } = await admin.fetchTopicMetadata({ topics });
+  const metadata = await admin.fetchTopicMetadata({ topics });
 
   const result: TopicStats[] = [];
   for (const topic of metadata) {

@@ -1,16 +1,15 @@
-import type { Consumer } from "kafkajs";
+import type { KafkaJS } from "@confluentinc/kafka-javascript";
 import { config } from "../config/config-loader";
 import { RunJob } from "../../application/run-job";
 import { JobCreatedEvent } from "../../domain/events";
 import { getTopicName } from "../../adapters/kafka/event.mapper";
 
 export async function startWorker(
-  consumer: Consumer,
+  consumer: KafkaJS.Consumer,
   runJob: RunJob,
 ): Promise<void> {
   await consumer.subscribe({
     topic: getTopicName(JobCreatedEvent.name),
-    fromBeginning: false,
   });
 
   await consumer.run({

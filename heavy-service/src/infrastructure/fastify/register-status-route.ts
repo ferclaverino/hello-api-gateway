@@ -3,9 +3,9 @@ import type { ZodTypeProvider } from "@fastify/type-provider-zod";
 import { statusSchema } from "./schemas/status.schema";
 import { getTopicStats } from "../kafka/kafka-topic-stats";
 import { toStatusResponse } from "../../adapters/fastify/status.mapper";
-import { Admin } from "kafkajs";
+import type { KafkaJS } from "@confluentinc/kafka-javascript";
 
-export function registerStatusRoute(app: FastifyInstance, admin: Admin): void {
+export function registerStatusRoute(app: FastifyInstance, admin: KafkaJS.Admin): void {
   app.withTypeProvider<ZodTypeProvider>().route({
     method: "GET",
     url: "/status",

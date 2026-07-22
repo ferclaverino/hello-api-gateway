@@ -1,4 +1,4 @@
-import { ProducerRecord } from "kafkajs";
+import type { KafkaJS } from "@confluentinc/kafka-javascript";
 import { DomainEvent, JobCreatedEvent } from "../../domain/events";
 
 interface EventMapper<E extends DomainEvent> {
@@ -14,7 +14,7 @@ export const mappers: Record<string, EventMapper<DomainEvent>> = {
   },
 };
 
-export function toMessage(domainEvent: DomainEvent): ProducerRecord {
+export function toMessage(domainEvent: DomainEvent): KafkaJS.ProducerRecord {
   const mapper: EventMapper<DomainEvent> | undefined =
     mappers[domainEvent.constructor.name];
   if (!mapper) {

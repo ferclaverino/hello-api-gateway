@@ -1,19 +1,20 @@
-import {
-  Kafka,
-  logLevel,
-  type Admin,
-  type Producer,
-  type Consumer,
-} from "kafkajs";
+import { KafkaJS } from "@confluentinc/kafka-javascript";
 import { kafkaBrokers, config } from "../config/config-loader";
 import { getTopicName } from "../../adapters/kafka/event.mapper";
 import { JobCreatedEvent } from "../../domain/events";
 
+type Kafka = KafkaJS.Kafka;
+type Admin = KafkaJS.Admin;
+type Producer = KafkaJS.Producer;
+type Consumer = KafkaJS.Consumer;
+
 export function createKafka(): Kafka {
-  return new Kafka({
-    clientId: config.KAFKA_CLIENT_ID,
-    brokers: kafkaBrokers,
-    logLevel: logLevel.WARN,
+  return new KafkaJS.Kafka({
+    kafkaJS: {
+      clientId: config.KAFKA_CLIENT_ID,
+      brokers: kafkaBrokers,
+      logLevel: KafkaJS.logLevel.WARN,
+    },
   });
 }
 
@@ -26,7 +27,7 @@ export class KafkaClientForService {
   constructor() {
     this.kafka = createKafka();
     this.admin = this.kafka.admin();
-    this.producer = this.kafka.producer({ allowAutoTopicCreation: false });
+    this.producer = this.kafka.producer({ kafkaJS: { allowAutoTopicCreation: false } });
   }
 
   async connect(): Promise<void> {
@@ -73,8 +74,10 @@ export class KafkaClientForWorker {
   constructor() {
     this.kafka = createKafka();
     this.consumer = this.kafka.consumer({
-      groupId: config.GROUP_ID,
-      allowAutoTopicCreation: false,
+      kafkaJS: {
+        groupId: config.GROUP_ID,
+        allowAutoTopicCreation: false,
+      },
     });
   }
 
