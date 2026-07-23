@@ -1,5 +1,5 @@
 import { JobWorker } from "../kafka/job-worker";
-import { KafkaClientForWorker } from "../kafka/kafka-client";
+import { KafkaClientForWorker } from "../kafka/kafka-client-for-worker";
 import { config } from "../config/config-loader";
 import { RunJob } from "../../application/run-job";
 import { RedisJobRepository } from "../redis/redis-job-repository";

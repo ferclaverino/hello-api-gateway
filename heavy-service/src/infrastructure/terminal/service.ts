@@ -4,7 +4,7 @@ import { registerMakeResultRoute as registerMakeResultRoute } from "../fastify/r
 import { registerCreateJobRoute } from "../fastify/register-create-job-route";
 import { registerGetJobRoute } from "../fastify/register-get-job-route";
 import { registerStatusRoute } from "../fastify/register-status-route";
-import { KafkaClientForService } from "../kafka/kafka-client";
+import { KafkaClientForService } from "../kafka/kafka-client-for-service";
 import { CreateJob } from "../../application/create-job";
 import { GetJob } from "../../application/get-job";
 import { RedisJobRepository } from "../redis/redis-job-repository";
