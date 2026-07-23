@@ -14,7 +14,7 @@ const jobWorker = new JobWorker(kafkaClient.consumer, runJob);
 
 async function main() {
   console.log(
-    `Starting heavy-worker id=${config.WORKER_ID} group=${config.GROUP_ID}`,
+    `Starting heavy-worker id=${config.WORKER_ID} group=${config.KAFKA_GROUP_ID}`,
   );
 
   await kafkaClient.connect();

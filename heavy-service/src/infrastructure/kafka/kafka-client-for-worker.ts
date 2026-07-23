@@ -12,7 +12,7 @@ export class KafkaClientForWorker {
     this.admin = this.kafka.admin();
     this.consumer = this.kafka.consumer({
       kafkaJS: {
-        groupId: config.GROUP_ID,
+        groupId: config.KAFKA_GROUP_ID,
         allowAutoTopicCreation: false,
       },
     });
@@ -37,13 +37,13 @@ export class KafkaClientForWorker {
     const sleep = (ms: number) =>
       new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-    const deadline = Date.now() + config.KAFKA_TOPIC_WAIT_TIMEOUT_MS;
+    const deadline = Date.now() + config.KAFKA_WAIT_FOR_TOPIC_TIMEOUT_MS;
     while (Date.now() < deadline) {
       const topics = await this.admin.listTopics();
       if (expected.every((t) => topics.includes(t))) {
         return;
       }
-      await sleep(config.KAFKA_TOPIC_WAIT_INTERVAL_MS);
+      await sleep(config.KAFKA_WAIT_FOR_TOPIC_INTERVAL_MS);
     }
 
     throw new Error(
