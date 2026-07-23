@@ -1,4 +1,4 @@
-import { startWorker } from "../kafka/job-worker";
+import { JobWorker } from "../kafka/job-worker";
 import { KafkaClientForWorker } from "../kafka/kafka-client";
 import { config } from "../config/config-loader";
 import { RunJob } from "../../application/run-job";
@@ -10,6 +10,7 @@ const kafkaClient = new KafkaClientForWorker();
 const makeResult = new MakeResult(config.MAKE_RESULT_DELAY_MS);
 const jobRepository = new RedisJobRepository();
 const runJob = new RunJob(jobRepository, makeResult);
+const jobWorker = new JobWorker(kafkaClient.consumer, runJob);
 
 async function main() {
   console.log(
@@ -22,7 +23,7 @@ async function main() {
   await connectRedis();
   console.log("Redis connected");
 
-  await startWorker(kafkaClient.consumer, runJob);
+  await jobWorker.start();
   console.log(`heavy-worker ${config.WORKER_ID} ready`);
 }
 

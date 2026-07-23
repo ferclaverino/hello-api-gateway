@@ -2,29 +2,38 @@ import type { KafkaJS } from "@confluentinc/kafka-javascript";
 import { config } from "../config/config-loader";
 import { RunJob } from "../../application/run-job";
 import { JobCreatedEvent } from "../../domain/events";
-import { getTopicName } from "../../adapters/kafka/event.mapper";
+import { fromMessage, getTopicName } from "../../adapters/kafka/event.mapper";
 
-export async function startWorker(
-  consumer: KafkaJS.Consumer,
-  runJob: RunJob,
-): Promise<void> {
-  await consumer.subscribe({
-    topic: getTopicName(JobCreatedEvent.name),
-  });
+export class JobWorker {
+  constructor(
+    private consumer: KafkaJS.Consumer,
+    private runJob: RunJob,
+  ) {}
 
-  await consumer.run({
-    eachMessage: async ({ message }) => {
-      const jobId = message.value?.toString();
+  async start(): Promise<void> {
+    await this.consumer.subscribe({
+      topic: getTopicName(JobCreatedEvent.name),
+    });
 
-      console.log(`[${config.WORKER_ID}] received job ${jobId}`);
+    await this.consumer.run({
+      eachMessage: async ({ message }) => {
+        const jobId = message.value?.toString();
+        const jobCreatedEvent = fromMessage<JobCreatedEvent>(
+          getTopicName(JobCreatedEvent.name),
+          jobId as string,
+        );
+        console.log(
+          `[${config.WORKER_ID}] received job ${jobCreatedEvent.jobId}`,
+        );
 
-      runJob.execute(jobId as string).then((job) => {
-        if (job) {
-          console.log(`[${config.WORKER_ID}] completed job ${job.id}`);
-        } else {
-          console.log(`[${config.WORKER_ID}] job ${jobId} not found`);
-        }
-      });
-    },
-  });
+        this.runJob.execute(jobCreatedEvent.jobId).then((job) => {
+          if (job) {
+            console.log(`[${config.WORKER_ID}] completed job ${job.id}`);
+          } else {
+            console.log(`[${config.WORKER_ID}] job ${jobId} not found`);
+          }
+        });
+      },
+    });
+  }
 }
