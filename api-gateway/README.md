@@ -1,8 +1,41 @@
 # api-gateway
 
-A round-robin load balancing proxy built with Fastify.
+A round-robin load balancing proxy built with Fastify. Serves as the single entry point for all client traffic.
 
 [← Back to main README](../README.md)
+
+## Architecture
+
+```
+domain ← adapters ← infrastructure
+```
+
+| Layer | What lives here |
+|-------|-----------------|
+| `domain` | `RoundRobinLoadBalancer` — pure function cycling through backends via modular arithmetic |
+| `domain` | `RouteTable` — maps URL path prefixes to backend lists, sorted by specificity |
+| `domain` | `BackendUrl`, `RouteEntry` — value objects |
+| `adapters` | Health endpoint schemas and request/response mappers |
+| `infrastructure` | Fastify server, proxy hooks, Zod config validation, `routes.yaml` loading |
+
+### Why round-robin?
+
+- No state persistence needed between requests
+- Predictable distribution across healthy instances
+- Easy to verify via the `instance` field in `/hello` responses
+
+### YAML-configurable routing
+
+Routes are defined in `routes.yaml` — add, remove, or reassign backends without touching code:
+
+```yaml
+routes:
+  /hello:
+    - http://light-service-1:3001/hello
+    - http://light-service-2:3002/hello
+  /job:
+    - http://heavy-service:3010/job
+```
 
 ## Setup
 
@@ -24,7 +57,7 @@ The gateway starts on `http://127.0.0.1:3000` by default.
 |----------|-------------|
 | `GET /hello` | Proxied to a backend via round-robin |
 | `POST /job` | Proxied to heavy-service |
-| `GET /health` | Returns gateway status and backend list |
+| `GET /health` | Returns gateway status, backend list, and route table |
 
 ## Environment Variables
 
