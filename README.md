@@ -7,13 +7,12 @@
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker)
 ![Zod](https://img.shields.io/badge/Zod-4.4-3068B7?logo=zod)
 ![Node.js](https://img.shields.io/badge/Node.js-24-339933?logo=node.js)
-![KRaft](https://img.shields.io/badge/Kafka_KRaft-231F20)
 
 A reference architecture for applying **clean code principles to distributed systems** — showing that scalable, production-grade services don't have to sacrifice readability, testability, or maintainability.
 
 ## Why this project?
 
-Distributed systems tend to accumulate accidental complexity fast: framework coupling, duplicated business logic, scattered configuration. This project proves that with the right design boundaries, you can have **both** — a system that scales horizontally *and* code that is easy to understand, change, and test.
+Distributed systems tend to accumulate accidental complexity fast: framework coupling, duplicated business logic, scattered configuration. This project proves that with the right design boundaries, you can have **both** — a system that scales horizontally _and_ code that is easy to understand, change, and test.
 
 ### What good design buys you
 
@@ -41,10 +40,10 @@ Distributed systems tend to accumulate accidental complexity fast: framework cou
                                                 (async workers)
 ```
 
-| Service | Role | Docs |
-|---------|------|------|
-| `api-gateway` | Single entry point. Round-robin load balancing, YAML-configurable routing | [api-gateway/](api-gateway/) |
-| `light-service` | Minimal HTTP service — proves horizontal scaling works | [light-service/](light-service/) |
+| Service         | Role                                                                       | Docs                             |
+| --------------- | -------------------------------------------------------------------------- | -------------------------------- |
+| `api-gateway`   | Single entry point. Round-robin load balancing, YAML-configurable routing  | [api-gateway/](api-gateway/)     |
+| `light-service` | Minimal HTTP service — proves horizontal scaling works                     | [light-service/](light-service/) |
 | `heavy-service` | HTTP-to-Kafka bridge + background worker (same codebase, two entry points) | [heavy-service/](heavy-service/) |
 
 Each service follows the same layered architecture:
@@ -77,7 +76,3 @@ curl http://127.0.0.1:3000/job/<jobId>
 # Health
 curl http://127.0.0.1:3000/health
 ```
-
-## Tech stack
-
-TypeScript 5.8 · Fastify 5.3 · Apache Kafka 7.6 · Redis 7 · Docker Compose · Zod 4.4 · Node.js 24
